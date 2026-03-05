@@ -49,6 +49,9 @@
 	<!-- Camera permission for card scanning feature -->
 	<key>NSCameraUsageDescription</key>
 	<string>Scan your card to add it automatically</string>
+	<!-- Photo library for profile pictures and image uploads -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a photo for your profile or to share in the app</string>
 	<!-- Stripe URL Scheme for 3D Secure and payment redirects -->
 	<key>CFBundleURLTypes</key>
 	<array>
