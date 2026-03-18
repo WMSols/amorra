@@ -45,6 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Export compliance: app uses only exempt (standard) encryption such as HTTPS/TLS -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<!-- Stripe Configuration -->
 	<!-- Camera permission for card scanning feature -->
 	<key>NSCameraUsageDescription</key>
