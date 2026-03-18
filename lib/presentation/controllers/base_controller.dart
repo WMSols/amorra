@@ -45,10 +45,7 @@ abstract class BaseController extends GetxController {
 
   /// Show info snackbar
   void showInfo(String message, {String? title, String? subtitle}) {
-    AppSnackbar.showInfo(
-      title: title ?? 'Info',
-      subtitle: subtitle ?? message,
-    );
+    AppSnackbar.showInfo(title: title ?? 'Info', subtitle: subtitle ?? message);
   }
 
   /// Show warning snackbar
@@ -65,4 +62,3 @@ abstract class BaseController extends GetxController {
     super.onClose();
   }
 }
-

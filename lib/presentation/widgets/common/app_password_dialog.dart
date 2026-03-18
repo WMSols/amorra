@@ -159,4 +159,3 @@ class _AppPasswordDialogState extends State<AppPasswordDialog> {
     );
   }
 }
-

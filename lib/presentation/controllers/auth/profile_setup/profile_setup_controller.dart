@@ -10,7 +10,6 @@ import 'package:amorra/data/services/chat_api_service.dart';
 import 'package:amorra/core/constants/app_constants.dart';
 import 'package:amorra/presentation/controllers/base_controller.dart';
 
-
 /// Profile Setup Controller
 /// Handles profile setup form state and validation
 class ProfileSetupController extends BaseController {
@@ -26,7 +25,7 @@ class ProfileSetupController extends BaseController {
   final RxList<String> selectedTopicsToAvoid = <String>[].obs;
   final RxString selectedRelationshipStatus = ''.obs;
   final RxString selectedSupportType = ''.obs;
-  
+
   // New fields
   final RxString selectedSexualOrientation = ''.obs;
   final RxString selectedInterestedIn = ''.obs;
@@ -178,7 +177,8 @@ class ProfileSetupController extends BaseController {
         final topicsToAvoidValue = prefs['topicsToAvoid'];
         if (topicsToAvoidValue is List) {
           selectedTopicsToAvoid.value = List<String>.from(topicsToAvoidValue);
-        } else if (topicsToAvoidValue is String && topicsToAvoidValue.isNotEmpty) {
+        } else if (topicsToAvoidValue is String &&
+            topicsToAvoidValue.isNotEmpty) {
           // Backward compatibility: convert old string format to list
           selectedTopicsToAvoid.value = [topicsToAvoidValue];
         } else {
@@ -195,7 +195,7 @@ class ProfileSetupController extends BaseController {
         selectedAiToolsFamiliarity.value = prefs['aiToolsFamiliarity'] ?? '';
         selectedStressResponse.value = prefs['stressResponse'] ?? '';
         selectedAiHonesty.value = prefs['aiHonesty'] ?? '';
-        
+
         if (kDebugMode) {
           print('✅ Loaded existing preferences from Firestore');
         }
@@ -223,14 +223,14 @@ class ProfileSetupController extends BaseController {
       // If null is passed, just return without doing anything
       return;
     }
-    
+
     // Toggle: if already selected, remove it; if not selected, add it
     if (selectedTopicsToAvoid.contains(topic)) {
       selectedTopicsToAvoid.remove(topic);
     } else {
       selectedTopicsToAvoid.add(topic);
     }
-    
+
     // Clear error when user makes a selection
     if (selectedTopicsToAvoid.isNotEmpty) {
       topicsToAvoidError.value = '';
@@ -380,7 +380,8 @@ class ProfileSetupController extends BaseController {
 
     // Validate relationshipStatus (required)
     if (selectedRelationshipStatus.value.isEmpty) {
-      relationshipStatusError.value = AppTexts.profileSetupErrorRelationshipStatus;
+      relationshipStatusError.value =
+          AppTexts.profileSetupErrorRelationshipStatus;
       isValid = false;
     }
 
@@ -392,7 +393,8 @@ class ProfileSetupController extends BaseController {
 
     // Validate sexualOrientation (required)
     if (selectedSexualOrientation.value.isEmpty) {
-      sexualOrientationError.value = AppTexts.profileSetupErrorSexualOrientation;
+      sexualOrientationError.value =
+          AppTexts.profileSetupErrorSexualOrientation;
       isValid = false;
     }
 
@@ -424,7 +426,8 @@ class ProfileSetupController extends BaseController {
 
     // Validate aiToolsFamiliarity (required)
     if (selectedAiToolsFamiliarity.value.isEmpty) {
-      aiToolsFamiliarityError.value = AppTexts.profileSetupErrorAiToolsFamiliarity;
+      aiToolsFamiliarityError.value =
+          AppTexts.profileSetupErrorAiToolsFamiliarity;
       isValid = false;
     }
 
@@ -610,7 +613,7 @@ class ProfileSetupController extends BaseController {
       // Check if onboarding is completed in Firebase (source of truth)
       final firebaseUser = _firebaseService.currentUser;
       bool onboardingCompleted = false;
-      
+
       if (firebaseUser != null) {
         try {
           // Check user document in Firestore for onboarding status
@@ -618,7 +621,7 @@ class ProfileSetupController extends BaseController {
               .collection(AppConstants.collectionUsers)
               .doc(firebaseUser.uid)
               .get();
-          
+
           if (userDoc.exists && userDoc.data() != null) {
             final userData = userDoc.data() as Map<String, dynamic>?;
             onboardingCompleted = userData?['isOnboardingCompleted'] ?? false;
@@ -628,13 +631,17 @@ class ProfileSetupController extends BaseController {
             print('⚠️ Error checking onboarding status: $e');
           }
           // If error, check local storage as fallback
-          onboardingCompleted = _storage.read<bool>(AppConstants.storageKeyOnboardingCompleted) ?? false;
+          onboardingCompleted =
+              _storage.read<bool>(AppConstants.storageKeyOnboardingCompleted) ??
+              false;
         }
       } else {
         // Fallback to local storage if no user
-        onboardingCompleted = _storage.read<bool>(AppConstants.storageKeyOnboardingCompleted) ?? false;
+        onboardingCompleted =
+            _storage.read<bool>(AppConstants.storageKeyOnboardingCompleted) ??
+            false;
       }
-      
+
       if (onboardingCompleted) {
         // Onboarding already completed, navigate to main app
         if (kDebugMode) {
@@ -677,14 +684,16 @@ class ProfileSetupController extends BaseController {
           .collection(AppConstants.collectionUserPreferences)
           .doc(userId)
           .set({
-        'userId': userId,
-        ...preferences,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+            'userId': userId,
+            ...preferences,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
 
       if (kDebugMode) {
-        print('✅ Preferences saved to Firestore subcollection: users/$userId/preferences/$userId');
+        print(
+          '✅ Preferences saved to Firestore subcollection: users/$userId/preferences/$userId',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
@@ -694,4 +703,3 @@ class ProfileSetupController extends BaseController {
     }
   }
 }
-

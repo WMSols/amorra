@@ -26,28 +26,26 @@ class SubscriptionPlanHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: AppSpacing.symmetric(context, h: 0.04, v: 0.02),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(
-            AppResponsive.radius(context, factor:1.25),
+      decoration:
+          BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(
+                AppResponsive.radius(context, factor: 1.25),
+              ),
+              topRight: Radius.circular(
+                AppResponsive.radius(context, factor: 1.25),
+              ),
+            ),
+          ).copyWith(
+            gradient: isPremium
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.primary, AppColors.secondary],
+                  )
+                : null,
+            color: isPremium ? null : AppColors.lightGrey,
           ),
-          topRight: Radius.circular(
-            AppResponsive.radius(context, factor:1.25),
-          ),
-        ),
-      ).copyWith(
-        gradient: isPremium
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primary,
-                  AppColors.secondary,
-                ],
-              )
-            : null,
-        color: isPremium ? null : AppColors.lightGrey,
-      ),
       child: Row(
         children: [
           Expanded(
@@ -115,4 +113,3 @@ class SubscriptionPlanHeader extends StatelessWidget {
     );
   }
 }
-

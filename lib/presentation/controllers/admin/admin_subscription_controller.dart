@@ -27,8 +27,9 @@ class AdminSubscriptionController extends AdminBaseController {
   final RxMap<String, dynamic> subscriptionAnalytics = <String, dynamic>{}.obs;
 
   // User info map (userId -> {name, email})
-  final RxMap<String, Map<String, String>> userInfo = <String, Map<String, String>>{}.obs;
-  
+  final RxMap<String, Map<String, String>> userInfo =
+      <String, Map<String, String>>{}.obs;
+
   // Legacy support - keep userEmails for backward compatibility
   Map<String, String> get userEmails {
     final Map<String, String> emails = {};
@@ -88,10 +89,7 @@ class AdminSubscriptionController extends AdminBaseController {
 
       // Setup stream
       _subscriptionsStreamSubscription = _adminService
-          .getSubscriptionsStream(
-            status: status,
-            planName: planName,
-          )
+          .getSubscriptionsStream(status: status, planName: planName)
           .listen(
             (subscriptionList) {
               // Apply search filter if any
@@ -100,15 +98,19 @@ class AdminSubscriptionController extends AdminBaseController {
                 subscriptions.value = subscriptionList.where((sub) {
                   return sub.id.toLowerCase().contains(query) ||
                       sub.userId.toLowerCase().contains(query) ||
-                      (sub.stripeSubscriptionId?.toLowerCase().contains(query) ?? false) ||
-                      (sub.stripeCustomerId?.toLowerCase().contains(query) ?? false);
+                      (sub.stripeSubscriptionId?.toLowerCase().contains(
+                            query,
+                          ) ??
+                          false) ||
+                      (sub.stripeCustomerId?.toLowerCase().contains(query) ??
+                          false);
                 }).toList();
               } else {
                 subscriptions.value = subscriptionList;
               }
 
               totalSubscriptions.value = subscriptions.length;
-              
+
               // Load user info (name and email) for subscriptions
               // Don't await - let it load in background and update UI reactively
               // Call it immediately to start fetching
@@ -117,13 +119,16 @@ class AdminSubscriptionController extends AdminBaseController {
                   print('Error in _loadUserInfo: $e');
                 }
               });
-              
+
               setLoading(false);
             },
             onError: (error) {
               setError(error.toString());
               setLoading(false);
-              showError('Failed to load subscriptions', subtitle: error.toString());
+              showError(
+                'Failed to load subscriptions',
+                subtitle: error.toString(),
+              );
             },
           );
     } catch (e) {
@@ -143,7 +148,8 @@ class AdminSubscriptionController extends AdminBaseController {
       subscriptions.value = subscriptions.where((sub) {
         return sub.id.toLowerCase().contains(query) ||
             sub.userId.toLowerCase().contains(query) ||
-            (sub.stripeSubscriptionId?.toLowerCase().contains(query) ?? false) ||
+            (sub.stripeSubscriptionId?.toLowerCase().contains(query) ??
+                false) ||
             (sub.stripeCustomerId?.toLowerCase().contains(query) ?? false);
       }).toList();
     }
@@ -170,7 +176,10 @@ class AdminSubscriptionController extends AdminBaseController {
   }
 
   /// Cancel subscription
-  Future<bool> cancelSubscription(String subscriptionId, {String? reason}) async {
+  Future<bool> cancelSubscription(
+    String subscriptionId, {
+    String? reason,
+  }) async {
     try {
       setLoading(true);
       await _adminService.cancelSubscription(subscriptionId, reason: reason);
@@ -237,25 +246,25 @@ class AdminSubscriptionController extends AdminBaseController {
 
       // Get current userInfo snapshot to check what we already have
       final currentUserInfo = Map<String, Map<String, String>>.from(userInfo);
-      
+
       // Filter out users we already have complete info for
-      final userIdsToFetch = uniqueUserIds
-          .where((userId) {
-            final existingInfo = currentUserInfo[userId];
-            // Fetch if we don't have info, or if name/email is missing or is '-'
-            return existingInfo == null || 
-                   existingInfo['name'] == null || 
-                   existingInfo['name'] == '-' ||
-                   existingInfo['email'] == null || 
-                   existingInfo['email'] == '-';
-          })
-          .toList();
+      final userIdsToFetch = uniqueUserIds.where((userId) {
+        final existingInfo = currentUserInfo[userId];
+        // Fetch if we don't have info, or if name/email is missing or is '-'
+        return existingInfo == null ||
+            existingInfo['name'] == null ||
+            existingInfo['name'] == '-' ||
+            existingInfo['email'] == null ||
+            existingInfo['email'] == '-';
+      }).toList();
 
       if (userIdsToFetch.isEmpty) return;
 
       // Start with current userInfo to preserve existing data
-      final Map<String, Map<String, String>> newUserInfo = Map.from(currentUserInfo);
-      
+      final Map<String, Map<String, String>> newUserInfo = Map.from(
+        currentUserInfo,
+      );
+
       // Fetch user info in batches and update reactively as we go
       for (final userId in userIdsToFetch) {
         try {
@@ -267,12 +276,9 @@ class AdminSubscriptionController extends AdminBaseController {
             };
           } else {
             // Fallback to '-' if user not found
-            newUserInfo[userId] = {
-              'name': '-',
-              'email': '-',
-            };
+            newUserInfo[userId] = {'name': '-', 'email': '-'};
           }
-          
+
           // Update reactively after each fetch to show data as it loads
           userInfo.value = Map.from(newUserInfo);
           userInfo.refresh(); // Ensure reactivity is triggered
@@ -281,10 +287,7 @@ class AdminSubscriptionController extends AdminBaseController {
             print('Error fetching user info for $userId: $e');
           }
           // Fallback to '-' on error
-          newUserInfo[userId] = {
-            'name': '-',
-            'email': '-',
-          };
+          newUserInfo[userId] = {'name': '-', 'email': '-'};
           // Update reactively even on error
           userInfo.value = Map.from(newUserInfo);
           userInfo.refresh(); // Ensure reactivity is triggered
@@ -333,4 +336,3 @@ class AdminSubscriptionController extends AdminBaseController {
     }
   }
 }
-

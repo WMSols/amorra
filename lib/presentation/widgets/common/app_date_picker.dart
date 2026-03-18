@@ -31,7 +31,7 @@ class _AppDatePickerState extends State<AppDatePicker> {
   DateTime? _selectedDate;
   late DateTime _firstDate;
   late DateTime _lastDate;
-  
+
   // Track selected indices for UI updates
   int _selectedMonthIndex = 5; // Default to June
   int _selectedDayIndex = 14; // Default to day 15
@@ -59,7 +59,7 @@ class _AppDatePickerState extends State<AppDatePicker> {
 
     _firstDate = widget.firstDate ?? DateTime(DateTime.now().year - 120, 1, 1);
     _lastDate = widget.lastDate ?? DateTime.now();
-    
+
     // If initialDate is provided, use it; otherwise start with null (empty/placeholder)
     _selectedDate = widget.initialDate;
 
@@ -68,23 +68,36 @@ class _AppDatePickerState extends State<AppDatePicker> {
       _selectedMonthIndex = _selectedDate!.month - 1;
       _selectedDayIndex = _selectedDate!.day - 1;
       _selectedYearIndex = _selectedDate!.year - _firstDate.year;
-      
-      _monthController = FixedExtentScrollController(initialItem: _selectedMonthIndex);
-      _dayController = FixedExtentScrollController(initialItem: _selectedDayIndex);
-      _yearController = FixedExtentScrollController(initialItem: _selectedYearIndex);
+
+      _monthController = FixedExtentScrollController(
+        initialItem: _selectedMonthIndex,
+      );
+      _dayController = FixedExtentScrollController(
+        initialItem: _selectedDayIndex,
+      );
+      _yearController = FixedExtentScrollController(
+        initialItem: _selectedYearIndex,
+      );
     } else {
       // Start at middle of range (neutral position)
-      final middleYear = _firstDate.year + ((_lastDate.year - _firstDate.year) ~/ 2);
+      final middleYear =
+          _firstDate.year + ((_lastDate.year - _firstDate.year) ~/ 2);
       final middleMonth = 6; // June (middle of year)
       final middleDay = 15; // Middle of month
-      
+
       _selectedMonthIndex = middleMonth - 1;
       _selectedDayIndex = middleDay - 1;
       _selectedYearIndex = middleYear - _firstDate.year;
-      
-      _monthController = FixedExtentScrollController(initialItem: _selectedMonthIndex);
-      _dayController = FixedExtentScrollController(initialItem: _selectedDayIndex);
-      _yearController = FixedExtentScrollController(initialItem: _selectedYearIndex);
+
+      _monthController = FixedExtentScrollController(
+        initialItem: _selectedMonthIndex,
+      );
+      _dayController = FixedExtentScrollController(
+        initialItem: _selectedDayIndex,
+      );
+      _yearController = FixedExtentScrollController(
+        initialItem: _selectedYearIndex,
+      );
     }
 
     // Add listeners to update date when wheels scroll
@@ -102,7 +115,8 @@ class _AppDatePickerState extends State<AppDatePicker> {
   }
 
   void _onMonthChanged() {
-    if (_monthController.hasClients && _monthController.position.hasContentDimensions) {
+    if (_monthController.hasClients &&
+        _monthController.position.hasContentDimensions) {
       setState(() {
         _selectedMonthIndex = _monthController.selectedItem;
       });
@@ -111,7 +125,8 @@ class _AppDatePickerState extends State<AppDatePicker> {
   }
 
   void _onDayChanged() {
-    if (_dayController.hasClients && _dayController.position.hasContentDimensions) {
+    if (_dayController.hasClients &&
+        _dayController.position.hasContentDimensions) {
       setState(() {
         _selectedDayIndex = _dayController.selectedItem;
       });
@@ -120,7 +135,8 @@ class _AppDatePickerState extends State<AppDatePicker> {
   }
 
   void _onYearChanged() {
-    if (_yearController.hasClients && _yearController.position.hasContentDimensions) {
+    if (_yearController.hasClients &&
+        _yearController.position.hasContentDimensions) {
       setState(() {
         _selectedYearIndex = _yearController.selectedItem;
       });
@@ -132,18 +148,26 @@ class _AppDatePickerState extends State<AppDatePicker> {
   void _updateDate({int? month, int? day, int? year}) {
     // If no date was selected before, initialize from current wheel positions
     if (_selectedDate == null) {
-      final currentMonth = month ?? (_monthController.hasClients ? _monthController.selectedItem + 1 : 6);
-      final currentYear = year ?? (_yearController.hasClients 
-          ? _firstDate.year + _yearController.selectedItem 
-          : _firstDate.year + ((_lastDate.year - _firstDate.year) ~/ 2));
-      final currentDay = day ?? (_dayController.hasClients ? _dayController.selectedItem + 1 : 15);
+      final currentMonth =
+          month ??
+          (_monthController.hasClients ? _monthController.selectedItem + 1 : 6);
+      final currentYear =
+          year ??
+          (_yearController.hasClients
+              ? _firstDate.year + _yearController.selectedItem
+              : _firstDate.year + ((_lastDate.year - _firstDate.year) ~/ 2));
+      final currentDay =
+          day ??
+          (_dayController.hasClients ? _dayController.selectedItem + 1 : 15);
       _selectedDate = DateTime(currentYear, currentMonth, currentDay);
     }
 
     final newMonth = month ?? _selectedDate!.month;
     final newYear = year ?? _selectedDate!.year;
     final maxDay = _getDaysInMonth(newMonth, newYear);
-    final newDay = day != null ? (day > maxDay ? maxDay : day) : _selectedDate!.day;
+    final newDay = day != null
+        ? (day > maxDay ? maxDay : day)
+        : _selectedDate!.day;
 
     // Ensure day doesn't exceed max days in month
     final adjustedDay = newDay > maxDay ? maxDay : newDay;
@@ -161,9 +185,16 @@ class _AppDatePickerState extends State<AppDatePicker> {
 
     // Update day controller if month/year changed
     if (month != null || year != null) {
-      final maxDays = _getDaysInMonth(_selectedDate!.month, _selectedDate!.year);
+      final maxDays = _getDaysInMonth(
+        _selectedDate!.month,
+        _selectedDate!.year,
+      );
       if (_selectedDate!.day > maxDays) {
-        _selectedDate = DateTime(_selectedDate!.year, _selectedDate!.month, maxDays);
+        _selectedDate = DateTime(
+          _selectedDate!.year,
+          _selectedDate!.month,
+          maxDays,
+        );
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_dayController.hasClients) {
@@ -203,16 +234,16 @@ class _AppDatePickerState extends State<AppDatePicker> {
   @override
   Widget build(BuildContext context) {
     // Get current wheel positions for calculations
-    final currentMonth = _monthController.hasClients 
-        ? _monthController.selectedItem + 1 
+    final currentMonth = _monthController.hasClients
+        ? _monthController.selectedItem + 1
         : _selectedMonthIndex + 1;
-    final currentYear = _yearController.hasClients 
-        ? _firstDate.year + _yearController.selectedItem 
+    final currentYear = _yearController.hasClients
+        ? _firstDate.year + _yearController.selectedItem
         : _firstDate.year + _selectedYearIndex;
-    
+
     final days = _getDaysForMonth(currentMonth, currentYear);
     final years = _getYears();
-    
+
     // Ensure day index is within valid range
     final validDayIndex = _selectedDayIndex.clamp(0, days.length - 1);
 
@@ -296,7 +327,10 @@ class _AppDatePickerState extends State<AppDatePicker> {
             child: Text(
               items[index],
               style: AppTextStyles.bodyText(context).copyWith(
-                fontSize: AppResponsive.scaleSize(context, isSelected ? 18 : 16),
+                fontSize: AppResponsive.scaleSize(
+                  context,
+                  isSelected ? 18 : 16,
+                ),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color: isSelected ? AppColors.black : AppColors.grey,
               ),
@@ -308,4 +342,3 @@ class _AppDatePickerState extends State<AppDatePicker> {
     );
   }
 }
-

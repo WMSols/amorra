@@ -38,4 +38,3 @@ class ThemeController extends GetxController {
     update();
   }
 }
-

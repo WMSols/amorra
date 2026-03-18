@@ -7,10 +7,7 @@ import 'package:amorra/core/utils/web/web_responsive/web_responsive.dart';
 class FilterChipsRow extends StatelessWidget {
   final List<FilterChipItem> chips;
 
-  const FilterChipsRow({
-    super.key,
-    required this.chips,
-  });
+  const FilterChipsRow({super.key, required this.chips});
 
   @override
   Widget build(BuildContext context) {
@@ -40,4 +37,3 @@ class FilterChipItem {
     required this.onTap,
   });
 }
-

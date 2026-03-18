@@ -132,7 +132,9 @@ class AdminSubscriptionsScreen extends GetView<AdminSubscriptionController> {
             // Access length first to ensure Obx watches the map
             final _ = controller.userInfo.length; // Trigger reactivity
             // Convert to regular map for widgets
-            final userInfo = Map<String, Map<String, String>>.from(controller.userInfo);
+            final userInfo = Map<String, Map<String, String>>.from(
+              controller.userInfo,
+            );
 
             if (controller.isLoading.value) {
               return const LoadingState();

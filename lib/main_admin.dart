@@ -4,7 +4,7 @@ import 'presentation/widgets/app/app_material_admin.dart';
 
 /// Admin Dashboard Entry Point
 /// Separate entry point for admin dashboard web app deployment
-/// 
+///
 /// Usage:
 /// - For web: flutter run -d chrome --target=lib/main_admin.dart
 /// - For build: flutter build web --target=lib/main_admin.dart
@@ -22,4 +22,3 @@ class AmorraAdminApp extends StatelessWidget {
     return const AppMaterialAdmin();
   }
 }
-

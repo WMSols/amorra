@@ -11,16 +11,12 @@ class AgeDisplay extends StatelessWidget {
   final int age;
   final bool isValidAge;
 
-  const AgeDisplay({
-    super.key,
-    required this.age,
-    required this.isValidAge,
-  });
+  const AgeDisplay({super.key, required this.age, required this.isValidAge});
 
   @override
   Widget build(BuildContext context) {
     final hasAge = age > 0;
-    
+
     return Container(
       padding: AppSpacing.symmetric(context, h: 0.03, v: 0.02),
       decoration: BoxDecoration(
@@ -29,7 +25,7 @@ class AgeDisplay extends StatelessWidget {
           AppResponsive.radius(context, factor: 1.5),
         ),
         border: Border.all(
-          color: hasAge 
+          color: hasAge
               ? (isValidAge ? AppColors.lightGrey : AppColors.error)
               : AppColors.lightGrey,
           width: hasAge && !isValidAge ? 1.5 : 1,
@@ -60,4 +56,3 @@ class AgeDisplay extends StatelessWidget {
     );
   }
 }
-

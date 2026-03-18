@@ -15,4 +15,3 @@ class AdminBinding extends Bindings {
     Get.lazyPut(() => AdminSubscriptionController(), fenix: true);
   }
 }
-

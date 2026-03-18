@@ -3,9 +3,10 @@ class AppImages {
 
   //app logo
   static const String splashLogo = 'assets/images/logo/app_logo.png';
-  
+
   //common
-  static const String startConversation = 'assets/images/common/start_conversation.png';
+  static const String startConversation =
+      'assets/images/common/start_conversation.png';
   static const String avatarAge40 = 'assets/images/common/avatar_age_40.png';
   static const String avatarAge60 = 'assets/images/common/avatar_age_60.png';
   static const String avatarAge70 = 'assets/images/common/avatar_age_70.png';

@@ -16,4 +16,3 @@ class BlockedUserBinding extends Bindings {
     Get.lazyPut(() => BlockedUserController());
   }
 }
-

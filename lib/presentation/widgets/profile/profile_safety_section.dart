@@ -79,4 +79,3 @@ class ProfileSafetySection extends StatelessWidget {
     );
   }
 }
-

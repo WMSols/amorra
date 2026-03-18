@@ -32,10 +32,13 @@ class NotFoundScreen extends StatelessWidget {
               color: Theme.of(context).colorScheme.error,
             ),
             AppSpacing.vertical(context, 0.01),
-            Text('404', style: AppTextStyles.headline(context).copyWith(
-              color: AppColors.black,
-              fontSize: AppResponsive.scaleSize(context, 30),
-            ),),
+            Text(
+              '404',
+              style: AppTextStyles.headline(context).copyWith(
+                color: AppColors.black,
+                fontSize: AppResponsive.scaleSize(context, 30),
+              ),
+            ),
             AppSpacing.vertical(context, 0.02),
             Text(
               'Screen Not Found',

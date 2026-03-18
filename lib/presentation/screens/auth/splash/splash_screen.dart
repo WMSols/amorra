@@ -29,4 +29,3 @@ class SplashScreen extends GetView<SplashController> {
     );
   }
 }
-

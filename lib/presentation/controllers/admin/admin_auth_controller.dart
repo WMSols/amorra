@@ -36,55 +36,63 @@ class AdminAuthController extends AdminBaseController {
   void _setupAuthListener() {
     // Cancel existing subscription if any
     _authStateSubscription?.cancel();
-    
-    _authStateSubscription = _adminAuthService.authStateChanges.listen((user) async {
-      isAuthenticated.value = user != null;
-      if (user != null) {
-        try {
-          // Check if user is admin
-          final adminStatus = await _adminAuthService.isAdmin();
-          isAdmin.value = adminStatus;
 
-          if (!adminStatus) {
-            // User is not admin, sign them out
-            await signOut();
-            showError('Access Denied', subtitle: 'This account is not authorized as admin.');
-          } else {
-            // User is admin, navigate to dashboard if not already there
-            if (Get.currentRoute != AppRoutes.adminDashboard) {
-              Get.offAllNamed(AppRoutes.adminDashboard);
+    _authStateSubscription = _adminAuthService.authStateChanges.listen(
+      (user) async {
+        isAuthenticated.value = user != null;
+        if (user != null) {
+          try {
+            // Check if user is admin
+            final adminStatus = await _adminAuthService.isAdmin();
+            isAdmin.value = adminStatus;
+
+            if (!adminStatus) {
+              // User is not admin, sign them out
+              await signOut();
+              showError(
+                'Access Denied',
+                subtitle: 'This account is not authorized as admin.',
+              );
+            } else {
+              // User is admin, navigate to dashboard if not already there
+              if (Get.currentRoute != AppRoutes.adminDashboard) {
+                Get.offAllNamed(AppRoutes.adminDashboard);
+              }
             }
+          } catch (e) {
+            // If checking admin status fails, treat as not admin
+            if (kDebugMode) {
+              print('Error checking admin status in listener: $e');
+            }
+            isAdmin.value = false;
+            // Don't sign out here to avoid loops, let the auth state handle it
           }
-        } catch (e) {
-          // If checking admin status fails, treat as not admin
-          if (kDebugMode) {
-            print('Error checking admin status in listener: $e');
-          }
+        } else {
           isAdmin.value = false;
-          // Don't sign out here to avoid loops, let the auth state handle it
+          // User signed out, navigate to login if not already there
+          // Only navigate if controller is still active
+          if (!isClosed && Get.currentRoute != AppRoutes.adminLogin) {
+            Get.offAllNamed(AppRoutes.adminLogin);
+          }
         }
-      } else {
-        isAdmin.value = false;
-        // User signed out, navigate to login if not already there
-        // Only navigate if controller is still active
-        if (!isClosed && Get.currentRoute != AppRoutes.adminLogin) {
-          Get.offAllNamed(AppRoutes.adminLogin);
+      },
+      onError: (error) {
+        // Silently handle errors after sign out (permission errors are expected)
+        if (kDebugMode) {
+          print(
+            'Auth state listener error (may be expected after sign out): $error',
+          );
         }
-      }
-    }, onError: (error) {
-      // Silently handle errors after sign out (permission errors are expected)
-      if (kDebugMode) {
-        print('Auth state listener error (may be expected after sign out): $error');
-      }
-      // Don't call setError here to avoid logging expected permission errors
-    });
+        // Don't call setError here to avoid logging expected permission errors
+      },
+    );
   }
 
   /// Check current auth state
   Future<void> _checkAuthState() async {
     // Don't check if controller is closed
     if (isClosed) return;
-    
+
     try {
       final user = _adminAuthService.currentAdmin;
       isAuthenticated.value = user != null;
@@ -101,7 +109,7 @@ class AdminAuthController extends AdminBaseController {
             }
           }
         } catch (e) {
-          // If checking admin status fails (e.g., permission denied), 
+          // If checking admin status fails (e.g., permission denied),
           // user is likely not authenticated or not admin
           // Only log if it's not a permission error (expected after sign out)
           final errorString = e.toString();
@@ -138,7 +146,10 @@ class AdminAuthController extends AdminBaseController {
       final adminStatus = await _adminAuthService.isAdmin();
       if (!adminStatus) {
         await signOut();
-        showError('Access Denied', subtitle: 'This account is not authorized as admin.');
+        showError(
+          'Access Denied',
+          subtitle: 'This account is not authorized as admin.',
+        );
         setLoading(false);
         return false;
       }
@@ -147,7 +158,7 @@ class AdminAuthController extends AdminBaseController {
       isAdmin.value = true;
       setLoading(false);
       showSuccess('Signed in successfully');
-      
+
       // Navigate to dashboard
       Get.offAllNamed(AppRoutes.adminDashboard);
       return true;
@@ -178,4 +189,3 @@ class AdminAuthController extends AdminBaseController {
   /// Get current admin email
   String? get currentAdminEmail => _adminAuthService.currentAdmin?.email;
 }
-

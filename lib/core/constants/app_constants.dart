@@ -6,7 +6,8 @@ class AppConstants {
   static const String storageKeyUserName = 'user_name';
   static const String storageKeyAgeVerified = 'age_verified';
   static const String storageKeyOnboardingCompleted = 'onboarding_completed';
-  static const String storageKeyProfileSetupCompleted = 'profile_setup_completed';
+  static const String storageKeyProfileSetupCompleted =
+      'profile_setup_completed';
   static const String storageKeySubscriptionStatus = 'subscription_status';
   static const String storageKeyThemeMode = 'theme_mode';
   static const String storageKeyAuthToken = 'auth_token';
@@ -35,15 +36,19 @@ class AppConstants {
 
   // Error Messages
   static const String errorGeneric = 'Something went wrong. Please try again.';
-  static const String errorNetwork = 'Network error. Please check your connection.';
+  static const String errorNetwork =
+      'Network error. Please check your connection.';
   static const String errorAuth = 'Authentication failed. Please login again.';
-  static const String errorSubscription = 'Subscription error. Please try again.';
-  static const String errorAgeVerification = 'You must be 40 or older to use this app.';
+  static const String errorSubscription =
+      'Subscription error. Please try again.';
+  static const String errorAgeVerification =
+      'You must be 40 or older to use this app.';
 
   // Success Messages
   static const String successAgeVerified = 'Age verified successfully';
   static const String successOnboardingComplete = 'Welcome to Amorra!';
-  static const String successSubscriptionActive = 'Subscription activated successfully';
+  static const String successSubscriptionActive =
+      'Subscription activated successfully';
   static const String successMessageSent = 'Message sent';
 
   // Age Verification
@@ -54,4 +59,3 @@ class AppConstants {
   static const int maxNameLength = 50;
   static const int maxMessageLength = 1000;
 }
-

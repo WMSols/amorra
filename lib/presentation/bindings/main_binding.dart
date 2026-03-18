@@ -18,8 +18,7 @@ class MainBinding extends Bindings {
     if (Get.isRegistered<AuthController>()) {
       try {
         Get.delete<AuthController>();
-      } catch (e) {
-      }
+      } catch (e) {}
     }
     // Mark as permanent: true to prevent it from being deleted during navigation
     Get.put(AuthController(), permanent: true);
@@ -42,14 +41,13 @@ class MainBinding extends Bindings {
     if (!Get.isRegistered<MainNavigationController>()) {
       Get.put(MainNavigationController(), permanent: false);
     }
-    
+
     // Register all main navigation controllers
     Get.lazyPut(() => HomeController());
     Get.lazyPut(() => ChatController());
     Get.lazyPut(() => ProfileController());
-    
+
     // Register ProfileSetupController for bottom sheet updates
     Get.lazyPut(() => ProfileSetupController());
   }
 }
-

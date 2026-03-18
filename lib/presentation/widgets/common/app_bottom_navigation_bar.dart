@@ -81,9 +81,7 @@ class AppBottomNavigationBar extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: () => onTap(index),
-        borderRadius: BorderRadius.circular(
-          AppResponsive.radius(context),
-        ),
+        borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -107,4 +105,3 @@ class AppBottomNavigationBar extends StatelessWidget {
     );
   }
 }
-

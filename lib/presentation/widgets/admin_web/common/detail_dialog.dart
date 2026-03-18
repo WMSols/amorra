@@ -36,10 +36,7 @@ class DetailDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      title,
-                      style: WebTextStyles.heading(context),
-                    ),
+                    child: Text(title, style: WebTextStyles.heading(context)),
                   ),
                   IconButton(
                     icon: const Icon(Iconsax.close_circle),
@@ -87,14 +84,9 @@ class DetailDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: WebResponsive.isDesktop(context) ? 180 : 120,
-            child: Text(
-              '${row.label}:',
-              style: WebTextStyles.label(context),
-            ),
+            child: Text('${row.label}:', style: WebTextStyles.label(context)),
           ),
-          Expanded(
-            child: row.value,
-          ),
+          Expanded(child: row.value),
         ],
       ),
     );
@@ -106,9 +98,5 @@ class DetailRow {
   final String label;
   final Widget value;
 
-  const DetailRow({
-    required this.label,
-    required this.value,
-  });
+  const DetailRow({required this.label, required this.value});
 }
-

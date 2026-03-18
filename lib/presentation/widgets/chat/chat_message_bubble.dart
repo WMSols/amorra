@@ -120,14 +120,15 @@ class ChatMessageBubble extends StatelessWidget {
                             fontSize: AppResponsive.scaleSize(context, 13),
                             height: 1.3,
                             fontFamily: 'monospace',
-                            backgroundColor: AppColors.white.withOpacity(0.2),
+                            backgroundColor: AppColors.white.withValues(alpha:0.2),
                           ),
-                          strikethroughStyle: AppTextStyles.bodyText(context).copyWith(
-                            color: AppColors.white,
-                            fontSize: AppResponsive.scaleSize(context, 14),
-                            height: 1.3,
-                            decoration: TextDecoration.lineThrough,
-                          ),
+                          strikethroughStyle: AppTextStyles.bodyText(context)
+                              .copyWith(
+                                color: AppColors.white,
+                                fontSize: AppResponsive.scaleSize(context, 14),
+                                height: 1.3,
+                                decoration: TextDecoration.lineThrough,
+                              ),
                         ),
                       ),
               ),
@@ -163,7 +164,8 @@ class ChatMessageBubble extends StatelessWidget {
             age: userAge,
             size: avatarSize,
             profileImageUrl: profileImageUrl,
-            showProfileImage: profileImageUrl != null && profileImageUrl!.isNotEmpty,
+            showProfileImage:
+                profileImageUrl != null && profileImageUrl!.isNotEmpty,
           ),
         ],
       ],

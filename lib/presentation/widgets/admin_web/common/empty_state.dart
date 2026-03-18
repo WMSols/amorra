@@ -32,13 +32,12 @@ class EmptyState extends StatelessWidget {
           WebSpacing.medium(context),
           Text(
             message,
-            style: WebTextStyles.bodyText(context).copyWith(
-              color: AppColors.grey,
-            ),
+            style: WebTextStyles.bodyText(
+              context,
+            ).copyWith(color: AppColors.grey),
           ),
         ],
       ),
     );
   }
 }
-

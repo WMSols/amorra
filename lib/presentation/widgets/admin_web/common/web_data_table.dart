@@ -38,13 +38,10 @@ class WebDataTable<T> extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           WebResponsive.radius(context, factor: 1.0),
         ),
-        border: Border.all(
-          color: AppColors.lightGrey,
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.lightGrey, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha:0.03),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -59,20 +56,20 @@ class WebDataTable<T> extends StatelessWidget {
           rows: rows,
           sortColumnIndex: sortColumnIndex,
           sortAscending: sortAscending,
-          headingRowHeight: headingRowHeight ??
-              (WebResponsive.isDesktop(context) ? 56 : 48),
-          dataRowHeight: dataRowHeight ??
-              (WebResponsive.isDesktop(context) ? 64 : 56),
+          headingRowHeight:
+              headingRowHeight ?? (WebResponsive.isDesktop(context) ? 56 : 48),
+          dataRowHeight:
+              dataRowHeight ?? (WebResponsive.isDesktop(context) ? 64 : 56),
           columnSpacing: WebResponsive.isDesktop(context) ? 56 : 24,
           headingRowColor: WidgetStateProperty.all(
-            AppColors.lightGrey.withOpacity(0.3),
+            AppColors.lightGrey.withValues(alpha:0.3),
           ),
           dataRowColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return AppColors.primary.withOpacity(0.1);
+              return AppColors.primary.withValues(alpha:0.1);
             }
             if (states.contains(WidgetState.hovered)) {
-              return AppColors.lightGrey.withOpacity(0.2);
+              return AppColors.lightGrey.withValues(alpha:0.2);
             }
             return null;
           }),
@@ -85,4 +82,3 @@ class WebDataTable<T> extends StatelessWidget {
     );
   }
 }
-

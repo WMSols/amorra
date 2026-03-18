@@ -46,10 +46,7 @@ abstract class AdminBaseController extends GetxController {
 
   /// Show info snackbar
   void showInfo(String message, {String? title, String? subtitle}) {
-    WebSnackbar.showInfo(
-      title: title ?? 'Info',
-      subtitle: subtitle ?? message,
-    );
+    WebSnackbar.showInfo(title: title ?? 'Info', subtitle: subtitle ?? message);
   }
 
   /// Show warning snackbar
@@ -66,4 +63,3 @@ abstract class AdminBaseController extends GetxController {
     super.onClose();
   }
 }
-

@@ -55,9 +55,10 @@ class AppInitializer {
   /// Set status bar style for the whole app
   static void _setStatusBarStyle() {
     SystemChrome.setSystemUIOverlayStyle(
-       const SystemUiOverlayStyle(
+      const SystemUiOverlayStyle(
         statusBarColor: AppColors.white,
-        statusBarIconBrightness: Brightness.dark, // Dark icons for white background
+        statusBarIconBrightness:
+            Brightness.dark, // Dark icons for white background
         statusBarBrightness: Brightness.light, // For iOS
       ),
     );
@@ -93,22 +94,22 @@ class AppInitializer {
   }
 
   /// Initialize Stripe payment service (TEST MODE ONLY)
-  /// 
+  ///
   /// IMPORTANT: This app is configured for TEST MODE only.
   /// Use Stripe TEST publishable keys (starting with 'pk_test_')
   /// from Stripe Dashboard > Developers > API keys > Test mode
-  /// 
+  ///
   /// iOS Configuration:
   /// - URL scheme configured in Info.plist: com.example.amorra
   /// - Camera permission for card scanning: NSCameraUsageDescription
   /// - Apple Pay merchant identifier (optional): Set STRIPE_MERCHANT_IDENTIFIER in .env
-  /// 
+  ///
   /// This is optional - Stripe can also be initialized on-demand when needed
   static Future<void> _initializeStripe() async {
     try {
       // Get Stripe publishable key from environment
       final publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
-      
+
       if (publishableKey != null && publishableKey.isNotEmpty) {
         // Validate test mode key
         if (!publishableKey.startsWith('pk_test_')) {
@@ -118,10 +119,10 @@ class AppInitializer {
             debugPrint('  Please use a Stripe TEST publishable key.');
           }
         }
-        
+
         // Get merchant identifier for iOS Apple Pay (optional)
         final merchantIdentifier = dotenv.env['STRIPE_MERCHANT_IDENTIFIER'];
-        
+
         final stripeService = StripeService();
         await stripeService.initialize(
           publishableKey,
@@ -130,13 +131,19 @@ class AppInitializer {
         if (kDebugMode) {
           debugPrint('✅ Stripe initialized successfully (TEST MODE)');
           if (merchantIdentifier != null) {
-            debugPrint('  - Apple Pay: Enabled (Merchant ID: $merchantIdentifier)');
+            debugPrint(
+              '  - Apple Pay: Enabled (Merchant ID: $merchantIdentifier)',
+            );
           }
         }
       } else {
         if (kDebugMode) {
-          debugPrint('ℹ️ Stripe publishable key not found - will initialize on-demand');
-          debugPrint('  Stripe will be initialized when user attempts to purchase');
+          debugPrint(
+            'ℹ️ Stripe publishable key not found - will initialize on-demand',
+          );
+          debugPrint(
+            '  Stripe will be initialized when user attempts to purchase',
+          );
         }
       }
     } catch (e) {
@@ -152,10 +159,9 @@ class AppInitializer {
   static void _initializeControllers() {
     // Initialize theme controller
     Get.put(ThemeController(), permanent: true);
-    
+
     if (kDebugMode) {
       debugPrint('GetX controllers initialized');
     }
   }
 }
-

@@ -56,15 +56,15 @@ class SubscriptionList extends StatelessWidget {
                       children: [
                         Text(
                           subscription.planName ?? 'Unknown Plan',
-                          style: WebTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: WebTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
                           'Name: ${userInfo[subscription.userId]?['name'] ?? '-'}',
-                          style: WebTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: WebTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
                           'Email: ${userInfo[subscription.userId]?['email'] ?? '-'}',
@@ -119,4 +119,3 @@ class SubscriptionList extends StatelessWidget {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
-

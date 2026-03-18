@@ -37,10 +37,7 @@ class WebTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: WebTextStyles.label(context),
-        ),
+        Text(label, style: WebTextStyles.label(context)),
         WebSpacing.small(context),
         TextFormField(
           controller: controller,
@@ -56,59 +53,46 @@ class WebTextField extends StatelessWidget {
             hintStyle: WebTextStyles.hintText(context),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: enabled ? AppColors.white : AppColors.lightGrey.withOpacity(0.3),
+            fillColor: enabled
+                ? AppColors.white
+                : AppColors.lightGrey.withValues(alpha:0.3),
             contentPadding: WebSpacing.inputField(context),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 WebResponsive.radius(context, factor: 1.0),
               ),
-              borderSide: BorderSide(
-                color: AppColors.lightGrey,
-                width: 1,
-              ),
+              borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 WebResponsive.radius(context, factor: 1.0),
               ),
-              borderSide: BorderSide(
-                color: AppColors.lightGrey,
-                width: 1,
-              ),
+              borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 WebResponsive.radius(context, factor: 1.0),
               ),
-              borderSide: BorderSide(
-                color: AppColors.primary,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 WebResponsive.radius(context, factor: 1.0),
               ),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: AppColors.error, width: 1),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 WebResponsive.radius(context, factor: 1.0),
               ),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 WebResponsive.radius(context, factor: 1.0),
               ),
               borderSide: BorderSide(
-                color: AppColors.lightGrey.withOpacity(0.5),
+                color: AppColors.lightGrey.withValues(alpha:0.5),
                 width: 1,
               ),
             ),
@@ -118,4 +102,3 @@ class WebTextField extends StatelessWidget {
     );
   }
 }
-

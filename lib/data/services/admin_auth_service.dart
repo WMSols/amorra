@@ -37,9 +37,12 @@ class AdminAuthService {
       // Fallback: Check Firestore admin collection
       // Only check if user is still authenticated
       if (_auth.currentUser == null) return false;
-      
+
       try {
-        final adminDoc = await _firestore.collection(adminCollection).doc(user.uid).get();
+        final adminDoc = await _firestore
+            .collection(adminCollection)
+            .doc(user.uid)
+            .get();
         return adminDoc.exists && (adminDoc.data()?['isAdmin'] == true);
       } catch (e) {
         // If Firestore check fails (e.g., permission denied), return false
@@ -103,7 +106,11 @@ class AdminAuthService {
 
   /// Create admin user (for initial setup)
   /// Note: This should be called from a secure backend or manually
-  Future<void> createAdminUser(String email, String password, String name) async {
+  Future<void> createAdminUser(
+    String email,
+    String password,
+    String name,
+  ) async {
     try {
       // Create user in Firebase Auth
       final credential = await _auth.createUserWithEmailAndPassword(
@@ -112,19 +119,24 @@ class AdminAuthService {
       );
 
       // Create admin document in Firestore
-      await _firestore.collection(adminCollection).doc(credential.user!.uid).set({
-        'email': email,
-        'name': name,
-        'isAdmin': true,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(adminCollection)
+          .doc(credential.user!.uid)
+          .set({
+            'email': email,
+            'name': name,
+            'isAdmin': true,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
 
       // Set custom claim (requires backend/Cloud Functions)
       // For now, we'll rely on Firestore check
       if (kDebugMode) {
         print('Admin user created: ${credential.user!.uid}');
-        print('Note: Custom claims should be set via Cloud Functions for better security');
+        print(
+          'Note: Custom claims should be set via Cloud Functions for better security',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
@@ -134,4 +146,3 @@ class AdminAuthService {
     }
   }
 }
-

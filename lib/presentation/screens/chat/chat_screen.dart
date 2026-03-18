@@ -42,39 +42,36 @@ class _ChatScreenState extends State<ChatScreen> {
               const ChatHeader(),
 
               // Messages List
-              Expanded(
-                child: ChatMessagesList(controller: controller),
-              ),
+              Expanded(child: ChatMessagesList(controller: controller)),
 
               // Daily Limit Info
-              Obx(
-                () {
-                  // Get subscription status - check SubscriptionController first (most up-to-date)
-                  bool isSubscribed = false;
-                  try {
-                    if (Get.isRegistered<SubscriptionController>()) {
-                      final subscriptionController = Get.find<SubscriptionController>();
-                      // Accessing .value makes Obx reactive to changes
-                      isSubscribed = subscriptionController.isSubscribed.value;
-                    }
-                  } catch (e) {
-                    // SubscriptionController not available, fallback to user model
+              Obx(() {
+                // Get subscription status - check SubscriptionController first (most up-to-date)
+                bool isSubscribed = false;
+                try {
+                  if (Get.isRegistered<SubscriptionController>()) {
+                    final subscriptionController =
+                        Get.find<SubscriptionController>();
+                    // Accessing .value makes Obx reactive to changes
+                    isSubscribed = subscriptionController.isSubscribed.value;
                   }
-                  
-                  // Fallback to user model if SubscriptionController not available
-                  if (!isSubscribed) {
-                    final user = controller.currentUser;
-                    isSubscribed = user?.isSubscribed ?? false;
-                  }
-                  
-                  return ChatDailyLimitInfo(
-                    remainingMessages: controller.remainingMessages.value,
-                    isLimitReached: !controller.canSendMessage,
-                    isWithinFreeTrial: controller.isWithinFreeTrial.value,
-                    isSubscribed: isSubscribed,
-                  );
-                },
-              ),
+                } catch (e) {
+                  // SubscriptionController not available, fallback to user model
+                }
+
+                // Fallback to user model if SubscriptionController not available
+                if (!isSubscribed) {
+                  final user = controller.currentUser;
+                  isSubscribed = user?.isSubscribed ?? false;
+                }
+
+                return ChatDailyLimitInfo(
+                  remainingMessages: controller.remainingMessages.value,
+                  isLimitReached: !controller.canSendMessage,
+                  isWithinFreeTrial: controller.isWithinFreeTrial.value,
+                  isSubscribed: isSubscribed,
+                );
+              }),
 
               // Input Field - wrapped in Flexible to prevent overflow
               Obx(

@@ -9,10 +9,7 @@ import 'package:amorra/core/utils/web/web_texts/web_texts.dart';
 class UserDetailDialog extends StatelessWidget {
   final UserModel user;
 
-  const UserDetailDialog({
-    super.key,
-    required this.user,
-  });
+  const UserDetailDialog({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +18,12 @@ class UserDetailDialog extends StatelessWidget {
       rows: [
         DetailRow(
           label: WebTexts.userDetailsName,
-          value: Text(
-            user.name,
-            style: WebTextStyles.bodyText(context),
-          ),
+          value: Text(user.name, style: WebTextStyles.bodyText(context)),
         ),
         if (user.email != null)
           DetailRow(
             label: WebTexts.userDetailsEmail,
-            value: Text(
-              user.email!,
-              style: WebTextStyles.bodyText(context),
-            ),
+            value: Text(user.email!, style: WebTextStyles.bodyText(context)),
           ),
         if (user.age != null)
           DetailRow(
@@ -44,10 +35,7 @@ class UserDetailDialog extends StatelessWidget {
           ),
         DetailRow(
           label: WebTexts.userDetailsUserId,
-          value: Text(
-            user.id,
-            style: WebTextStyles.bodyText(context),
-          ),
+          value: Text(user.id, style: WebTextStyles.bodyText(context)),
         ),
         DetailRow(
           label: WebTexts.userDetailsCreated,
@@ -107,4 +95,3 @@ class UserDetailDialog extends StatelessWidget {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 }
-

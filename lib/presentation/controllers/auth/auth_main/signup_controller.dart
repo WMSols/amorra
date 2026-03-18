@@ -91,9 +91,12 @@ class SignupController extends BaseController {
     if (_isDisposed) return;
 
     // Use Validators to check if fields are valid
-    final fullnameValid = Validators.validateName(fullnameController.text.trim()) == null;
-    final emailValid = Validators.validateEmail(emailController.text.trim()) == null;
-    final passwordValid = Validators.validatePassword(passwordController.text) == null;
+    final fullnameValid =
+        Validators.validateName(fullnameController.text.trim()) == null;
+    final emailValid =
+        Validators.validateEmail(emailController.text.trim()) == null;
+    final passwordValid =
+        Validators.validatePassword(passwordController.text) == null;
 
     isFormValid.value = fullnameValid && emailValid && passwordValid;
   }
@@ -125,14 +128,15 @@ class SignupController extends BaseController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-
   /// Sign up user
   Future<void> signUp() async {
     if (_isDisposed || _isNavigating) return;
 
     if (!isFormValid.value) {
-      showError('Oops! Something\'s missing',
-          subtitle: 'Please fill in all fields to create your account');
+      showError(
+        'Oops! Something\'s missing',
+        subtitle: 'Please fill in all fields to create your account',
+      );
       return;
     }
 
@@ -155,8 +159,11 @@ class SignupController extends BaseController {
 
       if (_isDisposed || _isNavigating) return;
 
-      showSuccess('Account Created!',
-          subtitle: 'Your account has been created. Please verify your age to continue.');
+      showSuccess(
+        'Account Created!',
+        subtitle:
+            'Your account has been created. Please verify your age to continue.',
+      );
 
       _isNavigating = true;
 
@@ -167,7 +174,6 @@ class SignupController extends BaseController {
         // Navigate to age verification screen
         Get.offAllNamed(routes.AppRoutes.ageVerification);
       }
-
     } catch (e) {
       if (_isDisposed) return;
       final errorInfo = FirebaseErrorHandler.parseError(e);
@@ -194,8 +200,11 @@ class SignupController extends BaseController {
 
       if (_isDisposed || _isNavigating) return;
 
-      showSuccess('Account Created!',
-          subtitle: 'Your account has been created with Google. Please verify your age to continue.');
+      showSuccess(
+        'Account Created!',
+        subtitle:
+            'Your account has been created with Google. Please verify your age to continue.',
+      );
 
       _isNavigating = true;
 
@@ -206,7 +215,6 @@ class SignupController extends BaseController {
         // Navigate to age verification screen
         Get.offAllNamed(routes.AppRoutes.ageVerification);
       }
-
     } on SignupRequiredException catch (e) {
       if (_isDisposed) return;
 
@@ -228,7 +236,6 @@ class SignupController extends BaseController {
       }
       isFromGoogle.value = true;
       validateForm();
-
     } catch (e) {
       if (_isDisposed) return;
       final errorInfo = FirebaseErrorHandler.parseError(e);

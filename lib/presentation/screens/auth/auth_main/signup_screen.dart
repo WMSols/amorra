@@ -34,7 +34,11 @@ class SignupScreen extends GetView<SignupController> {
             children: [
               // Fixed Header
               Padding(
-                padding: AppSpacing.symmetric(context, h: 0.04, v: 0.02).copyWith(bottom: 0),
+                padding: AppSpacing.symmetric(
+                  context,
+                  h: 0.04,
+                  v: 0.02,
+                ).copyWith(bottom: 0),
                 child: AuthHeader(
                   title: AppTexts.signupTitle,
                   subtitle: AppTexts.signupSubtitle,
@@ -44,7 +48,11 @@ class SignupScreen extends GetView<SignupController> {
               // Scrollable Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: AppSpacing.symmetric(context, h: 0.04, v: 0.02).copyWith(top: 0),
+                  padding: AppSpacing.symmetric(
+                    context,
+                    h: 0.04,
+                    v: 0.02,
+                  ).copyWith(top: 0),
                   child: Form(
                     key: controller.formKey,
                     child: Column(
@@ -78,7 +86,8 @@ class SignupScreen extends GetView<SignupController> {
                             controller: controller.passwordController,
                             obscureText: controller.isPasswordVisible.value,
                             showPasswordToggle: true,
-                            onTogglePassword: controller.togglePasswordVisibility,
+                            onTogglePassword:
+                                controller.togglePasswordVisibility,
                             validator: controller.validatePassword,
                           ),
                         ),
@@ -106,12 +115,19 @@ class SignupScreen extends GetView<SignupController> {
                               ),
                             ),
                             Padding(
-                              padding: AppSpacing.symmetric(context, h: 0.02, v: 0),
+                              padding: AppSpacing.symmetric(
+                                context,
+                                h: 0.02,
+                                v: 0,
+                              ),
                               child: Text(
                                 AppTexts.orContinueWith,
                                 style: TextStyle(
                                   color: AppColors.grey,
-                                  fontSize: AppResponsive.scaleSize(context, 14),
+                                  fontSize: AppResponsive.scaleSize(
+                                    context,
+                                    14,
+                                  ),
                                 ),
                               ),
                             ),

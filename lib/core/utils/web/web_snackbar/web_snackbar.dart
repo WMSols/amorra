@@ -66,7 +66,7 @@ class WebSnackbar extends StatelessWidget {
         border: Border.all(color: _borderColor, width: 2),
         boxShadow: [
           BoxShadow(
-            color: _borderColor.withOpacity(0.2),
+            color: _borderColor.withValues(alpha:0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -99,9 +99,9 @@ class WebSnackbar extends StatelessWidget {
                 WebSpacing.small(context),
                 Text(
                   subtitle,
-                  style: WebTextStyles.caption(context).copyWith(
-                    color: AppColors.grey,
-                  ),
+                  style: WebTextStyles.caption(
+                    context,
+                  ).copyWith(color: AppColors.grey),
                 ),
               ],
             ),
@@ -267,4 +267,3 @@ class WebSnackbar extends StatelessWidget {
     );
   }
 }
-

@@ -6,4 +6,3 @@ class AppLotties {
   static const String loadingPrimary = 'assets/lotties/loading_primary.json';
   static const String typing = 'assets/lotties/typing.json';
 }
-

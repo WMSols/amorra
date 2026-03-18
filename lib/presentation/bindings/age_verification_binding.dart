@@ -19,4 +19,3 @@ class AgeVerificationBinding extends Bindings {
     );
   }
 }
-

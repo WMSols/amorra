@@ -11,8 +11,7 @@ class SplashBinding extends Bindings {
     if (!Get.isRegistered<AuthRepository>()) {
       Get.put(AuthRepository(), permanent: true);
     }
-    
+
     Get.lazyPut(() => SplashController());
   }
 }
-

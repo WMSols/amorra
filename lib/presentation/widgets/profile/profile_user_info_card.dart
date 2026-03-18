@@ -57,4 +57,3 @@ class ProfileUserInfoCard extends StatelessWidget {
     );
   }
 }
-

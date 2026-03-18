@@ -9,10 +9,7 @@ import 'package:amorra/core/utils/web/web_texts/web_texts.dart';
 class SubscriptionDetailDialog extends StatelessWidget {
   final SubscriptionModel subscription;
 
-  const SubscriptionDetailDialog({
-    super.key,
-    required this.subscription,
-  });
+  const SubscriptionDetailDialog({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +18,7 @@ class SubscriptionDetailDialog extends StatelessWidget {
       rows: [
         DetailRow(
           label: WebTexts.subscriptionDetailsId,
-          value: Text(
-            subscription.id,
-            style: WebTextStyles.bodyText(context),
-          ),
+          value: Text(subscription.id, style: WebTextStyles.bodyText(context)),
         ),
         DetailRow(
           label: WebTexts.subscriptionDetailsUserId,
@@ -118,4 +112,3 @@ class SubscriptionDetailDialog extends StatelessWidget {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
-

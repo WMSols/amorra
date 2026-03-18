@@ -50,20 +50,25 @@ class SigninController extends BaseController {
   /// Load remembered credentials if remember me was enabled
   void _loadRememberedCredentials() {
     try {
-      final shouldRemember = _storage.read<bool>(AppConstants.storageKeyRememberMe) ?? false;
+      final shouldRemember =
+          _storage.read<bool>(AppConstants.storageKeyRememberMe) ?? false;
       rememberMe.value = shouldRemember;
-      
+
       if (shouldRemember) {
-        final rememberedEmail = _storage.read<String>(AppConstants.storageKeyRememberedEmail);
-        final rememberedPassword = _storage.read<String>(AppConstants.storageKeyRememberedPassword);
-        
+        final rememberedEmail = _storage.read<String>(
+          AppConstants.storageKeyRememberedEmail,
+        );
+        final rememberedPassword = _storage.read<String>(
+          AppConstants.storageKeyRememberedPassword,
+        );
+
         if (rememberedEmail != null && rememberedEmail.isNotEmpty) {
           emailController.text = rememberedEmail;
         }
         if (rememberedPassword != null && rememberedPassword.isNotEmpty) {
           passwordController.text = rememberedPassword;
         }
-        
+
         // Trigger validation after loading credentials
         Future.microtask(() => _validateForm());
       }
@@ -87,8 +92,14 @@ class SigninController extends BaseController {
     try {
       if (rememberMe.value) {
         await _storage.write(AppConstants.storageKeyRememberMe, true);
-        await _storage.write(AppConstants.storageKeyRememberedEmail, emailController.text.trim());
-        await _storage.write(AppConstants.storageKeyRememberedPassword, passwordController.text);
+        await _storage.write(
+          AppConstants.storageKeyRememberedEmail,
+          emailController.text.trim(),
+        );
+        await _storage.write(
+          AppConstants.storageKeyRememberedPassword,
+          passwordController.text,
+        );
       } else {
         await _storage.remove(AppConstants.storageKeyRememberMe);
         await _storage.remove(AppConstants.storageKeyRememberedEmail);
@@ -112,15 +123,19 @@ class SigninController extends BaseController {
     if (_isDisposed) return;
 
     // Use Validators to check if fields are valid
-    final emailValid = Validators.validateEmail(emailController.text.trim()) == null;
-    final passwordValid = Validators.validatePassword(passwordController.text) == null;
+    final emailValid =
+        Validators.validateEmail(emailController.text.trim()) == null;
+    final passwordValid =
+        Validators.validatePassword(passwordController.text) == null;
 
     // If remember me is active and credentials are loaded, form is valid
-    final hasRememberedCredentials = rememberMe.value &&
+    final hasRememberedCredentials =
+        rememberMe.value &&
         emailController.text.trim().isNotEmpty &&
         passwordController.text.isNotEmpty;
 
-    isFormValid.value = (emailValid && passwordValid) || hasRememberedCredentials;
+    isFormValid.value =
+        (emailValid && passwordValid) || hasRememberedCredentials;
   }
 
   /// Validate email
@@ -144,8 +159,10 @@ class SigninController extends BaseController {
     if (_isDisposed || _isNavigating) return;
 
     if (!isFormValid.value) {
-      showError('Oops! Something\'s missing',
-          subtitle: 'Please fill in all fields to continue');
+      showError(
+        'Oops! Something\'s missing',
+        subtitle: 'Please fill in all fields to continue',
+      );
       return;
     }
 
@@ -168,17 +185,19 @@ class SigninController extends BaseController {
       // Check age verification and profile setup status
       final currentUser = _firebaseService.currentUser;
       if (currentUser != null) {
-        final verificationStatus = await _authRepository.getAgeVerificationStatus(currentUser.uid);
-        
-        if (verificationStatus == null || verificationStatus['isAgeVerified'] != true) {
+        final verificationStatus = await _authRepository
+            .getAgeVerificationStatus(currentUser.uid);
+
+        if (verificationStatus == null ||
+            verificationStatus['isAgeVerified'] != true) {
           // Not verified, navigate to age verification
           if (kDebugMode) {
             print('⚠️ User not age verified, navigating to age verification');
           }
-          
+
           _isNavigating = true;
           await Future.delayed(const Duration(milliseconds: 300));
-          
+
           if (!_isDisposed) {
             Get.offAllNamed(routes.AppRoutes.ageVerification);
           }
@@ -186,17 +205,20 @@ class SigninController extends BaseController {
         }
 
         // Age verified, check profile setup status
-        final isProfileSetupCompleted = await _authRepository.getProfileSetupStatus(currentUser.uid);
-        
+        final isProfileSetupCompleted = await _authRepository
+            .getProfileSetupStatus(currentUser.uid);
+
         if (!isProfileSetupCompleted) {
           // Profile setup not completed, navigate to profile setup
           if (kDebugMode) {
-            print('⚠️ User age verified but profile setup not completed, navigating to profile setup');
+            print(
+              '⚠️ User age verified but profile setup not completed, navigating to profile setup',
+            );
           }
-          
+
           _isNavigating = true;
           await Future.delayed(const Duration(milliseconds: 300));
-          
+
           if (!_isDisposed) {
             Get.offAllNamed(routes.AppRoutes.profileSetup);
           }
@@ -204,8 +226,10 @@ class SigninController extends BaseController {
         }
       }
 
-      showSuccess('Welcome back!',
-          subtitle: 'You\'ve successfully signed in. Let\'s get started!');
+      showSuccess(
+        'Welcome back!',
+        subtitle: 'You\'ve successfully signed in. Let\'s get started!',
+      );
 
       _isNavigating = true;
 
@@ -215,7 +239,6 @@ class SigninController extends BaseController {
       if (!_isDisposed) {
         Get.offAllNamed(routes.AppRoutes.mainNavigation);
       }
-
     } catch (e) {
       if (_isDisposed) return;
       final errorInfo = FirebaseErrorHandler.parseError(e);
@@ -246,34 +269,36 @@ class SigninController extends BaseController {
       final currentUser = _firebaseService.currentUser;
       if (currentUser != null) {
         final userModel = await _authRepository.getCurrentUser();
-        
+
         if (userModel != null && userModel.isBlocked) {
           // User is blocked, navigate to blocked user screen
           if (kDebugMode) {
             print('🚫 User is blocked, navigating to blocked user screen');
           }
-          
+
           _isNavigating = true;
           await Future.delayed(const Duration(milliseconds: 300));
-          
+
           if (!_isDisposed) {
             Get.offAllNamed(routes.AppRoutes.blockedUser);
           }
           return;
         }
-        
+
         // User is not blocked, check age verification and profile setup status
-        final verificationStatus = await _authRepository.getAgeVerificationStatus(currentUser.uid);
-        
-        if (verificationStatus == null || verificationStatus['isAgeVerified'] != true) {
+        final verificationStatus = await _authRepository
+            .getAgeVerificationStatus(currentUser.uid);
+
+        if (verificationStatus == null ||
+            verificationStatus['isAgeVerified'] != true) {
           // Not verified, navigate to age verification
           if (kDebugMode) {
             print('⚠️ User not age verified, navigating to age verification');
           }
-          
+
           _isNavigating = true;
           await Future.delayed(const Duration(milliseconds: 300));
-          
+
           if (!_isDisposed) {
             Get.offAllNamed(routes.AppRoutes.ageVerification);
           }
@@ -281,17 +306,20 @@ class SigninController extends BaseController {
         }
 
         // Age verified, check profile setup status
-        final isProfileSetupCompleted = await _authRepository.getProfileSetupStatus(currentUser.uid);
-        
+        final isProfileSetupCompleted = await _authRepository
+            .getProfileSetupStatus(currentUser.uid);
+
         if (!isProfileSetupCompleted) {
           // Profile setup not completed, navigate to profile setup
           if (kDebugMode) {
-            print('⚠️ User age verified but profile setup not completed, navigating to profile setup');
+            print(
+              '⚠️ User age verified but profile setup not completed, navigating to profile setup',
+            );
           }
-          
+
           _isNavigating = true;
           await Future.delayed(const Duration(milliseconds: 300));
-          
+
           if (!_isDisposed) {
             Get.offAllNamed(routes.AppRoutes.profileSetup);
           }
@@ -299,8 +327,11 @@ class SigninController extends BaseController {
         }
       }
 
-      showSuccess('Welcome!',
-          subtitle: 'You\'ve successfully signed in with Google. Enjoy your experience!');
+      showSuccess(
+        'Welcome!',
+        subtitle:
+            'You\'ve successfully signed in with Google. Enjoy your experience!',
+      );
 
       _isNavigating = true;
 
@@ -310,7 +341,6 @@ class SigninController extends BaseController {
       if (!_isDisposed) {
         Get.offAllNamed(routes.AppRoutes.mainNavigation);
       }
-
     } on SignupRequiredException catch (e) {
       if (_isDisposed) return;
 
@@ -333,7 +363,8 @@ class SigninController extends BaseController {
 
         showInfo(
           'Complete Your Signup',
-          subtitle: 'Please enter your name and create a password to complete your account setup with Google.',
+          subtitle:
+              'Please enter your name and create a password to complete your account setup with Google.',
         );
       }
       _isNavigating = false;
@@ -352,10 +383,12 @@ class SigninController extends BaseController {
   /// Forgot password
   void forgotPassword() {
     if (_isDisposed) return;
-    showInfo('Coming Soon',
-        subtitle: 'Password recovery feature will be available shortly. Stay tuned!');
+    showInfo(
+      'Coming Soon',
+      subtitle:
+          'Password recovery feature will be available shortly. Stay tuned!',
+    );
   }
-
 
   @override
   void onClose() {

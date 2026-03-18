@@ -11,10 +11,7 @@ extension AppGradientExtension on BoxDecoration {
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          AppColors.primary,
-          AppColors.secondary,
-        ],
+        colors: [AppColors.primary, AppColors.secondary],
       ),
     );
   }

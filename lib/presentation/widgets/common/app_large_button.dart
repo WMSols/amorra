@@ -36,14 +36,12 @@ class AppLargeButton extends StatelessWidget {
             borderRadius: borderRadius,
           )
         : backgroundColor != null
-            ? BoxDecoration(
-                color: backgroundColor,
-                borderRadius: borderRadius,
-              )
-            : BoxDecoration(borderRadius: borderRadius).withAppGradient();
+        ? BoxDecoration(color: backgroundColor, borderRadius: borderRadius)
+        : BoxDecoration(borderRadius: borderRadius).withAppGradient();
 
     // Determine text color
-    final finalTextColor = textColor ??
+    final finalTextColor =
+        textColor ??
         (backgroundColor != null ? AppColors.primary : AppColors.white);
 
     return SizedBox(
@@ -58,9 +56,7 @@ class AppLargeButton extends StatelessWidget {
             decoration: decoration,
             child: Center(
               child: isLoading
-                  ? AppLoadingIndicator(
-                      color: finalTextColor,
-                    )
+                  ? AppLoadingIndicator(color: finalTextColor)
                   : Text(
                       text,
                       style: AppTextStyles.buttonText(context).copyWith(

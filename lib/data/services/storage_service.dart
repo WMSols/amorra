@@ -27,15 +27,13 @@ class StorageService {
         imageFile,
         SettableMetadata(
           contentType: 'image/jpeg',
-          customMetadata: {
-            'uploadedAt': DateTime.now().toIso8601String(),
-          },
+          customMetadata: {'uploadedAt': DateTime.now().toIso8601String()},
         ),
       );
 
       // Wait for upload to complete
       final snapshot = await uploadTask;
-      
+
       // Get download URL
       final downloadUrl = await snapshot.ref.getDownloadURL();
 
@@ -94,4 +92,3 @@ class StorageService {
     }
   }
 }
-

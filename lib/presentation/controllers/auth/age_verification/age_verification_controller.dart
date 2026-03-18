@@ -17,10 +17,10 @@ class AgeVerificationController extends BaseController {
 
   // Date selection
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
-  
+
   // Calculated age
   final RxInt calculatedAge = 0.obs;
-  
+
   // Validation states
   final RxBool isDateSelected = false.obs;
   final RxBool isValidAge = false.obs;
@@ -45,22 +45,30 @@ class AgeVerificationController extends BaseController {
       }
 
       // Check Firestore first (source of truth)
-      final verificationStatus = await _authRepository.getAgeVerificationStatus(currentUser.uid);
-      
-      if (verificationStatus != null && verificationStatus['isAgeVerified'] == true) {
+      final verificationStatus = await _authRepository.getAgeVerificationStatus(
+        currentUser.uid,
+      );
+
+      if (verificationStatus != null &&
+          verificationStatus['isAgeVerified'] == true) {
         // User is verified, check profile setup status
-        final isProfileSetupCompleted = await _authRepository.getProfileSetupStatus(currentUser.uid);
-        
+        final isProfileSetupCompleted = await _authRepository
+            .getProfileSetupStatus(currentUser.uid);
+
         if (isProfileSetupCompleted) {
           // Profile setup completed, navigate to main
           if (kDebugMode) {
-            print('✅ User age verified and profile setup completed, navigating to main');
+            print(
+              '✅ User age verified and profile setup completed, navigating to main',
+            );
           }
           _navigateToMain();
         } else {
           // Profile setup not completed, navigate to profile setup
           if (kDebugMode) {
-            print('⚠️ User age verified but profile setup not completed, navigating to profile setup');
+            print(
+              '⚠️ User age verified but profile setup not completed, navigating to profile setup',
+            );
           }
           _navigateToProfileSetup();
         }
@@ -68,7 +76,8 @@ class AgeVerificationController extends BaseController {
       }
 
       // Check local storage as fallback
-      final localVerified = _storage.read<bool>(AppConstants.storageKeyAgeVerified) ?? false;
+      final localVerified =
+          _storage.read<bool>(AppConstants.storageKeyAgeVerified) ?? false;
       if (localVerified) {
         // If local says verified but Firestore doesn't, re-verify
         // But for now, if local says verified, trust it (will sync on next verification)
@@ -94,13 +103,13 @@ class AgeVerificationController extends BaseController {
   void _calculateAge(DateTime dateOfBirth) {
     final now = DateTime.now();
     int age = now.year - dateOfBirth.year;
-    
+
     // Adjust if birthday hasn't occurred this year
     if (now.month < dateOfBirth.month ||
         (now.month == dateOfBirth.month && now.day < dateOfBirth.day)) {
       age--;
     }
-    
+
     calculatedAge.value = age;
     _validateAge(age);
   }
@@ -126,10 +135,7 @@ class AgeVerificationController extends BaseController {
   /// Verify age and save to Firestore
   Future<void> verifyAge() async {
     if (!isDateSelected.value || selectedDate.value == null) {
-      showError(
-        'Date Required',
-        subtitle: 'Please select your date of birth',
-      );
+      showError('Date Required', subtitle: 'Please select your date of birth');
       return;
     }
 
@@ -183,7 +189,8 @@ class AgeVerificationController extends BaseController {
 
       showSuccess(
         'Age Verified!',
-        subtitle: 'Thank you for verifying your age. You\'re all set to continue!',
+        subtitle:
+            'Thank you for verifying your age. You\'re all set to continue!',
       );
 
       // Wait a bit for user to see success message
@@ -197,7 +204,8 @@ class AgeVerificationController extends BaseController {
       }
       showError(
         'Verification Failed',
-        subtitle: 'We couldn\'t verify your age. Please check your connection and try again.',
+        subtitle:
+            'We couldn\'t verify your age. Please check your connection and try again.',
       );
     } finally {
       setLoading(false);

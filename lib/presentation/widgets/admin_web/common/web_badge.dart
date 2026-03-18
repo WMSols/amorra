@@ -24,14 +24,11 @@ class WebBadge extends StatelessWidget {
         vertical: WebResponsive.isDesktop(context) ? 6 : 4,
       ),
       decoration: BoxDecoration(
-        color: backgroundColor ?? color.withOpacity(0.15),
+        color: backgroundColor ?? color.withValues(alpha:0.15),
         borderRadius: BorderRadius.circular(
           WebResponsive.radius(context, factor: 0.5),
         ),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha:0.3), width: 1),
       ),
       child: Text(
         text.toUpperCase(),
@@ -43,4 +40,3 @@ class WebBadge extends StatelessWidget {
     );
   }
 }
-

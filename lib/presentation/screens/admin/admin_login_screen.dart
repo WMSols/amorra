@@ -32,7 +32,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     // Initialize controllers once in initState
     emailController = TextEditingController();
     passwordController = TextEditingController();
-    
+
     // Ensure controller is initialized
     if (!Get.isRegistered<AdminAuthController>()) {
       Get.put(AdminAuthController());
@@ -59,9 +59,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: AppColors.lightGrey.withOpacity(0.3),
+      backgroundColor: AppColors.lightGrey.withValues(alpha:0.3),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -90,9 +89,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         WebSpacing.large(context),
                         Text(
                           WebTexts.adminLoginTitle,
-                          style: WebTextStyles.largeHeading(context).copyWith(
-                            color: AppColors.primary
-                          ),
+                          style: WebTextStyles.largeHeading(
+                            context,
+                          ).copyWith(color: AppColors.primary),
                           textAlign: TextAlign.center,
                         ),
                         WebSpacing.medium(context),
@@ -152,7 +151,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   void _handleSignIn() {
     final email = emailController.text;
     final password = passwordController.text;
-    
+
     if (email.isEmpty || password.isEmpty) {
       controller.showError(
         WebTexts.messageValidationError,

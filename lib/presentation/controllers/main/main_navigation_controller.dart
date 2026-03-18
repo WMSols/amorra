@@ -22,15 +22,17 @@ class MainNavigationController extends BaseController {
     try {
       if (Get.isRegistered<AuthController>()) {
         final authController = Get.find<AuthController>();
-        
+
         // Listen to currentUser changes and refresh all controllers
         ever(authController.currentUser, (user) {
           if (kDebugMode) {
-            print('🔄 MainNavigationController: User changed, refreshing all controllers');
+            print(
+              '🔄 MainNavigationController: User changed, refreshing all controllers',
+            );
           }
           _refreshAllControllers();
         });
-        
+
         // Immediately refresh if user is already logged in
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (authController.currentUser.value != null) {
@@ -47,7 +49,9 @@ class MainNavigationController extends BaseController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Error setting up user listener in MainNavigationController: $e');
+        print(
+          '❌ Error setting up user listener in MainNavigationController: $e',
+        );
       }
     }
   }
@@ -70,7 +74,9 @@ class MainNavigationController extends BaseController {
           // Directly handle user change instead of calling refresh
           homeController.handleUserChange(user);
           if (kDebugMode) {
-            print('✅ HomeController refreshed for user: ${user?.name ?? 'null'}');
+            print(
+              '✅ HomeController refreshed for user: ${user?.name ?? 'null'}',
+            );
           }
         } catch (e) {
           if (kDebugMode) {
@@ -86,7 +92,9 @@ class MainNavigationController extends BaseController {
           // Directly handle user change instead of calling refreshChat
           chatController.handleUserChange(user);
           if (kDebugMode) {
-            print('✅ ChatController refreshed for user: ${user?.name ?? 'null'}');
+            print(
+              '✅ ChatController refreshed for user: ${user?.name ?? 'null'}',
+            );
           }
         } catch (e) {
           if (kDebugMode) {
@@ -106,4 +114,3 @@ class MainNavigationController extends BaseController {
     currentIndex.value = index;
   }
 }
-

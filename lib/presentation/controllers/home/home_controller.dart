@@ -25,8 +25,9 @@ class HomeController extends BaseController {
   final RxString greeting = ''.obs;
   final RxBool hasActiveChat = false.obs;
   final Rx<ChatMessageModel?> lastMessage = Rx<ChatMessageModel?>(null);
-  final RxList<DailySuggestionModel> dailySuggestions = <DailySuggestionModel>[].obs;
-  
+  final RxList<DailySuggestionModel> dailySuggestions =
+      <DailySuggestionModel>[].obs;
+
   // Loading states for individual sections
   final RxBool isUserNameLoading = true.obs;
   final RxBool isSuggestionsLoading = true.obs;
@@ -51,10 +52,10 @@ class HomeController extends BaseController {
     super.onInit();
     // Set up user listener immediately (synchronously) to catch all changes
     _setupUserListener();
-    
+
     // Set up listener for chat messages to update last message in real-time
     _setupChatMessagesListener();
-    
+
     // Delay other setup slightly to ensure AuthController is fully initialized
     Future.microtask(() {
       try {
@@ -98,33 +99,37 @@ class HomeController extends BaseController {
       _suggestionsSubscription = _suggestionsRepository
           .getActiveSuggestionsStream()
           .listen(
-        (suggestions) {
-          if (kDebugMode) {
-            print('✅ Daily suggestions stream update: ${suggestions.length} items');
-          }
-          dailySuggestions.value = suggestions;
-          isSuggestionsLoading.value = false;
-        },
-        onError: (error) {
-          // Only log error if user is still authenticated
-          // Permission errors are expected when user logs out
-          if (userId != null) {
-            if (kDebugMode) {
-              print('❌ Error listening to suggestions stream: $error');
-            }
-            setError('Failed to load suggestions');
-            // Set empty list on error
-            dailySuggestions.value = [];
-            isSuggestionsLoading.value = false;
-          } else {
-            // User logged out, silently ignore permission errors
-            if (kDebugMode) {
-              print('ℹ️ Suggestions stream error after logout (expected): $error');
-            }
-          }
-        },
-        cancelOnError: false, // Keep listening even on error
-      );
+            (suggestions) {
+              if (kDebugMode) {
+                print(
+                  '✅ Daily suggestions stream update: ${suggestions.length} items',
+                );
+              }
+              dailySuggestions.value = suggestions;
+              isSuggestionsLoading.value = false;
+            },
+            onError: (error) {
+              // Only log error if user is still authenticated
+              // Permission errors are expected when user logs out
+              if (userId != null) {
+                if (kDebugMode) {
+                  print('❌ Error listening to suggestions stream: $error');
+                }
+                setError('Failed to load suggestions');
+                // Set empty list on error
+                dailySuggestions.value = [];
+                isSuggestionsLoading.value = false;
+              } else {
+                // User logged out, silently ignore permission errors
+                if (kDebugMode) {
+                  print(
+                    'ℹ️ Suggestions stream error after logout (expected): $error',
+                  );
+                }
+              }
+            },
+            cancelOnError: false, // Keep listening even on error
+          );
 
       if (kDebugMode) {
         print('✅ Suggestions stream listener set up');
@@ -158,19 +163,18 @@ class HomeController extends BaseController {
       }
 
       final authController = Get.find<AuthController>();
-      
-        // Listen to currentUser changes reactively
-        // This will fire whenever currentUser.value changes
-        ever(authController.currentUser, (UserModel? user) {
-          handleUserChange(user);
-        });
-      
+
+      // Listen to currentUser changes reactively
+      // This will fire whenever currentUser.value changes
+      ever(authController.currentUser, (UserModel? user) {
+        handleUserChange(user);
+      });
+
       // Immediately check and handle the current user value
       // This ensures we catch the user if they're already logged in
       WidgetsBinding.instance.addPostFrameCallback((_) {
         handleUserChange(authController.currentUser.value);
       });
-      
     } catch (e) {
       if (kDebugMode) {
         print('❌ Error setting up user listener: $e');
@@ -186,21 +190,23 @@ class HomeController extends BaseController {
     try {
       if (user != null && user.name.isNotEmpty) {
         if (kDebugMode) {
-          print('👤 User changed in HomeController: ${user.name} (ID: ${user.id})');
+          print(
+            '👤 User changed in HomeController: ${user.name} (ID: ${user.id})',
+          );
         }
         // Set user name IMMEDIATELY (synchronously) - don't wait for async operations
         userName.value = user.name;
         isUserNameLoading.value = false;
-        
+
         // Cancel old suggestions stream first
         _suggestionsSubscription?.cancel();
         _suggestionsSubscription = null;
         dailySuggestions.clear();
         isSuggestionsLoading.value = true; // Show loading while fetching
-        
+
         // Re-setup suggestions stream for the new user FIRST (this is critical)
         _setupSuggestionsListener();
-        
+
         // Then re-initialize all other data (async, but doesn't block UI)
         _initializeData();
       } else {
@@ -232,7 +238,7 @@ class HomeController extends BaseController {
     try {
       // Don't set loading=true here as it blocks the UI
       // Only set loading for specific operations that need it
-      
+
       // Set time-based greeting (synchronous)
       greeting.value = _getTimeBasedGreeting();
 
@@ -275,7 +281,7 @@ class HomeController extends BaseController {
       if (!Get.isRegistered<AuthController>()) {
         return;
       }
-      
+
       final currentUserId = userId;
       if (currentUserId == null) return;
 
@@ -295,12 +301,12 @@ class HomeController extends BaseController {
       Future.delayed(const Duration(milliseconds: 200), () {
         if (Get.isRegistered<ChatController>()) {
           final chatController = Get.find<ChatController>();
-          
+
           // Listen to messages changes and update last message and active chat status
           ever(chatController.messages, (List<ChatMessageModel> messages) {
             _updateLastMessageFromChat(messages);
           });
-          
+
           // Immediately update with current messages
           if (chatController.messages.isNotEmpty) {
             _updateLastMessageFromChat(chatController.messages);
@@ -329,9 +335,11 @@ class HomeController extends BaseController {
         final latestMessage = messages.last;
         lastMessage.value = latestMessage;
         hasActiveChat.value = true;
-        
+
         if (kDebugMode) {
-          print('📝 Updated last message in HomeController: ${latestMessage.message.substring(0, latestMessage.message.length > 30 ? 30 : latestMessage.message.length)}...');
+          print(
+            '📝 Updated last message in HomeController: ${latestMessage.message.substring(0, latestMessage.message.length > 30 ? 30 : latestMessage.message.length)}...',
+          );
         }
       } else {
         lastMessage.value = null;
@@ -350,7 +358,7 @@ class HomeController extends BaseController {
       if (!Get.isRegistered<AuthController>()) {
         return;
       }
-      
+
       final currentUserId = userId;
       if (currentUserId == null) return;
 
@@ -379,7 +387,7 @@ class HomeController extends BaseController {
           chatController.setPendingStarterMessage(starterMessage);
         }
       }
-      
+
       // Get MainNavigationController and change to chat tab (index 1)
       final mainNavController = Get.find<MainNavigationController>();
       mainNavController.changeTab(1); // Chat tab index
@@ -388,8 +396,10 @@ class HomeController extends BaseController {
         print('Error navigating to chat: $e');
       }
       // Fallback: try to navigate using route
-      Get.toNamed(AppRoutes.chat, arguments: {'starterMessage': starterMessage});
+      Get.toNamed(
+        AppRoutes.chat,
+        arguments: {'starterMessage': starterMessage},
+      );
     }
   }
 }
-

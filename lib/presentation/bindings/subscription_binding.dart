@@ -10,4 +10,3 @@ class SubscriptionBinding extends Bindings {
     Get.lazyPut(() => SubscriptionController());
   }
 }
-

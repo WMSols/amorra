@@ -189,14 +189,14 @@ class AdminUserController extends AdminBaseController {
     // Optimistically update the local list for immediate UI feedback
     final userIndex = users.indexWhere((u) => u.id == userId);
     bool wasUpdated = false;
-    
+
     if (userIndex != -1) {
       final updatedUser = users[userIndex].copyWith(isBlocked: true);
       users[userIndex] = updatedUser;
       users.refresh(); // Ensure reactivity
       wasUpdated = true;
     }
-    
+
     try {
       await _adminService.blockUser(userId, reason: reason);
       showSuccess('User blocked successfully');
@@ -221,14 +221,14 @@ class AdminUserController extends AdminBaseController {
     // Optimistically update the local list for immediate UI feedback
     final userIndex = users.indexWhere((u) => u.id == userId);
     bool wasUpdated = false;
-    
+
     if (userIndex != -1) {
       final updatedUser = users[userIndex].copyWith(isBlocked: false);
       users[userIndex] = updatedUser;
       users.refresh(); // Ensure reactivity
       wasUpdated = true;
     }
-    
+
     try {
       await _adminService.unblockUser(userId);
       showSuccess('User unblocked successfully');
@@ -265,5 +265,4 @@ class AdminUserController extends AdminBaseController {
     selectedFilter.value = filter;
     loadUsers();
   }
-
 }

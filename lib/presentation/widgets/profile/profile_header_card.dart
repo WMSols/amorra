@@ -29,8 +29,7 @@ class ProfileHeaderCard extends GetView<ProfileController> {
       final hasProfileImage = controller.hasProfileImage;
 
       final avatarSize =
-          AppResponsive.screenWidth(context) *
-          (isEditingName ? 0.25 : 0.35);
+          AppResponsive.screenWidth(context) * (isEditingName ? 0.25 : 0.35);
 
       return AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -70,7 +69,9 @@ class ProfileHeaderCard extends GetView<ProfileController> {
                   height: avatarSize,
                   child: controller.pageController != null
                       ? PageView.builder(
-                          key: ValueKey(hasProfileImage ? 'hasImage' : 'noImage'),
+                          key: ValueKey(
+                            hasProfileImage ? 'hasImage' : 'noImage',
+                          ),
                           controller: controller.pageController!,
                           onPageChanged: controller.onPageChanged,
                           itemCount: hasProfileImage ? 2 : 1,
@@ -154,11 +155,11 @@ class ProfileHeaderCard extends GetView<ProfileController> {
                           begin: const Offset(0.0, 0.1),
                           end: Offset.zero,
                         ).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOut,
-                      ),
-                    ),
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
                     child: child,
                   ),
                 );

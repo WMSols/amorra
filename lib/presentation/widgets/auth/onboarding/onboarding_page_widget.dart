@@ -32,29 +32,29 @@ class OnboardingPageWidget extends StatelessWidget {
             height: AppResponsive.screenHeight(context) * 0.4,
             fit: BoxFit.contain,
           ),
-          
+
           AppSpacing.vertical(context, 0.05),
-          
+
           // Title
           Text(
             title,
             style: AppTextStyles.headline(context).copyWith(
               color: AppColors.black,
               fontSize: AppResponsive.scaleSize(context, 26),
-              height: 1.2
+              height: 1.2,
             ),
             textAlign: TextAlign.center,
           ),
-          
+
           AppSpacing.vertical(context, 0.02),
-          
+
           // Subtitle
           Text(
             subtitle,
             style: AppTextStyles.bodyText(context).copyWith(
               color: AppColors.grey,
               fontSize: AppResponsive.scaleSize(context, 16),
-              height: 1.2
+              height: 1.2,
             ),
             textAlign: TextAlign.center,
           ),
@@ -63,4 +63,3 @@ class OnboardingPageWidget extends StatelessWidget {
     );
   }
 }
-

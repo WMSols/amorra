@@ -9,4 +9,3 @@ class OnboardingBinding extends Bindings {
     Get.lazyPut(() => OnboardingController());
   }
 }
-

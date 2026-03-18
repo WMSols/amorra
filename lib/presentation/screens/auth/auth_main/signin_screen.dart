@@ -102,7 +102,8 @@ class SigninScreen extends GetView<SigninController> {
                             onPressed: controller.isFormValid.value
                                 ? controller.signIn
                                 : null,
-                            isLoading: controller.isEmailPasswordSigninLoading.value,
+                            isLoading:
+                                controller.isEmailPasswordSigninLoading.value,
                           ),
                         ),
                         AppSpacing.vertical(context, 0.04),

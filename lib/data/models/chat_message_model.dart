@@ -34,24 +34,25 @@ class ChatMessageModel extends BaseModel {
       type: json['type'] ?? 'user',
       timestamp: _parseTimestamp(json['timestamp']),
       // Handle both is_typing (backend) and isTyping (frontend) for backward compatibility
-      isTyping: (json['is_typing'] as bool?) ?? (json['isTyping'] as bool?) ?? false,
+      isTyping:
+          (json['is_typing'] as bool?) ?? (json['isTyping'] as bool?) ?? false,
       metadata: json['metadata'],
     );
   }
-  
+
   /// Parse timestamp from various formats
   static DateTime _parseTimestamp(dynamic timestamp) {
     if (timestamp == null) return DateTime.now();
-    
+
     // If it's already a DateTime
     if (timestamp is DateTime) {
       return timestamp;
     }
-    
+
     // If it's a Firestore Timestamp object (has toDate method)
     try {
       // Firestore Timestamp objects have a toDate() method
-      if (timestamp.toString().contains('Timestamp') || 
+      if (timestamp.toString().contains('Timestamp') ||
           timestamp.runtimeType.toString().contains('Timestamp')) {
         // Use dynamic call to handle Firestore Timestamp
         return (timestamp as dynamic).toDate() as DateTime;
@@ -59,7 +60,7 @@ class ChatMessageModel extends BaseModel {
     } catch (e) {
       // If toDate() doesn't work, try other methods
     }
-    
+
     // If it's a Map with _seconds (serialized Firestore Timestamp)
     if (timestamp is Map) {
       if (timestamp.containsKey('_seconds')) {
@@ -72,7 +73,7 @@ class ChatMessageModel extends BaseModel {
         }
       }
     }
-    
+
     // Default fallback
     return DateTime.now();
   }
@@ -117,4 +118,3 @@ class ChatMessageModel extends BaseModel {
     return ChatMessageModel.fromJson(json);
   }
 }
-

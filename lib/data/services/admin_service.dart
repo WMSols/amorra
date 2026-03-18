@@ -30,19 +30,31 @@ class AdminService {
         query = query.where('isBlocked', isEqualTo: isBlocked);
       }
       if (subscriptionStatus != null) {
-        query = query.where('subscriptionStatus', isEqualTo: subscriptionStatus);
+        query = query.where(
+          'subscriptionStatus',
+          isEqualTo: subscriptionStatus,
+        );
       }
       if (isOnboardingCompleted != null) {
-        query = query.where('isOnboardingCompleted', isEqualTo: isOnboardingCompleted);
+        query = query.where(
+          'isOnboardingCompleted',
+          isEqualTo: isOnboardingCompleted,
+        );
       }
       if (isAgeVerified != null) {
         query = query.where('isAgeVerified', isEqualTo: isAgeVerified);
       }
       if (createdAfter != null) {
-        query = query.where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(createdAfter));
+        query = query.where(
+          'createdAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(createdAfter),
+        );
       }
       if (createdBefore != null) {
-        query = query.where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(createdBefore));
+        query = query.where(
+          'createdAt',
+          isLessThanOrEqualTo: Timestamp.fromDate(createdBefore),
+        );
       }
 
       // Order by creation date (newest first)
@@ -52,10 +64,7 @@ class AdminService {
         return snapshot.docs.map((doc) {
           try {
             final data = doc.data() as Map<String, dynamic>;
-            return UserModel.fromJson({
-              'id': doc.id,
-              ...data,
-            });
+            return UserModel.fromJson({'id': doc.id, ...data});
           } catch (e) {
             if (kDebugMode) {
               print('Error parsing user document ${doc.id}: $e');
@@ -85,10 +94,7 @@ class AdminService {
       }
 
       final data = doc.data() ?? {};
-      return UserModel.fromJson({
-        'id': doc.id,
-        ...data,
-      });
+      return UserModel.fromJson({'id': doc.id, ...data});
     } catch (e) {
       if (kDebugMode) {
         print('Error getting user by ID: $e');
@@ -123,23 +129,21 @@ class AdminService {
             .limit(10)
             .get();
 
-        results.addAll(emailSnapshot.docs.map((doc) {
-          final data = doc.data();
-          return UserModel.fromJson({
-            'id': doc.id,
-            ...data,
-          });
-        }));
+        results.addAll(
+          emailSnapshot.docs.map((doc) {
+            final data = doc.data();
+            return UserModel.fromJson({'id': doc.id, ...data});
+          }),
+        );
       }
 
       // Add name search results
-      results.addAll(snapshot.docs.map((doc) {
-        final data = doc.data();
-        return UserModel.fromJson({
-          'id': doc.id,
-          ...data,
-        });
-      }));
+      results.addAll(
+        snapshot.docs.map((doc) {
+          final data = doc.data();
+          return UserModel.fromJson({'id': doc.id, ...data});
+        }),
+      );
 
       // Remove duplicates
       final uniqueResults = <String, UserModel>{};
@@ -175,12 +179,15 @@ class AdminService {
   /// Block user
   Future<void> blockUser(String userId, {String? reason}) async {
     try {
-      await _firestore.collection(AppConstants.collectionUsers).doc(userId).update({
-        'isBlocked': true,
-        'blockedAt': FieldValue.serverTimestamp(),
-        'blockReason': reason,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionUsers)
+          .doc(userId)
+          .update({
+            'isBlocked': true,
+            'blockedAt': FieldValue.serverTimestamp(),
+            'blockReason': reason,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
       if (kDebugMode) {
         print('Error blocking user: $e');
@@ -192,12 +199,15 @@ class AdminService {
   /// Unblock user
   Future<void> unblockUser(String userId) async {
     try {
-      await _firestore.collection(AppConstants.collectionUsers).doc(userId).update({
-        'isBlocked': false,
-        'blockedAt': FieldValue.delete(),
-        'blockReason': FieldValue.delete(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionUsers)
+          .doc(userId)
+          .update({
+            'isBlocked': false,
+            'blockedAt': FieldValue.delete(),
+            'blockReason': FieldValue.delete(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
       if (kDebugMode) {
         print('Error unblocking user: $e');
@@ -240,11 +250,14 @@ class AdminService {
       final trialEndDate = now.add(Duration(days: days));
 
       // Update user with trial end date
-      await _firestore.collection(AppConstants.collectionUsers).doc(userId).update({
-        'freeTrialEndDate': Timestamp.fromDate(trialEndDate),
-        'freeTrialGrantedAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionUsers)
+          .doc(userId)
+          .update({
+            'freeTrialEndDate': Timestamp.fromDate(trialEndDate),
+            'freeTrialGrantedAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
       if (kDebugMode) {
         print('Error granting free trial: $e');
@@ -273,10 +286,16 @@ class AdminService {
         query = query.where('planName', isEqualTo: planName);
       }
       if (startDateAfter != null) {
-        query = query.where('startDate', isGreaterThanOrEqualTo: Timestamp.fromDate(startDateAfter));
+        query = query.where(
+          'startDate',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDateAfter),
+        );
       }
       if (startDateBefore != null) {
-        query = query.where('startDate', isLessThanOrEqualTo: Timestamp.fromDate(startDateBefore));
+        query = query.where(
+          'startDate',
+          isLessThanOrEqualTo: Timestamp.fromDate(startDateBefore),
+        );
       }
 
       // Order by creation date (newest first)
@@ -286,10 +305,7 @@ class AdminService {
         return snapshot.docs.map((doc) {
           try {
             final data = doc.data() as Map<String, dynamic>;
-            return SubscriptionModel.fromJson({
-              'id': doc.id,
-              ...data,
-            });
+            return SubscriptionModel.fromJson({'id': doc.id, ...data});
           } catch (e) {
             if (kDebugMode) {
               print('Error parsing subscription document ${doc.id}: $e');
@@ -319,10 +335,7 @@ class AdminService {
       }
 
       final data = doc.data() ?? {};
-      return SubscriptionModel.fromJson({
-        'id': doc.id,
-        ...data,
-      });
+      return SubscriptionModel.fromJson({'id': doc.id, ...data});
     } catch (e) {
       if (kDebugMode) {
         print('Error getting subscription by ID: $e');
@@ -332,7 +345,9 @@ class AdminService {
   }
 
   /// Get subscriptions by user ID
-  Future<List<SubscriptionModel>> getSubscriptionsByUserId(String userId) async {
+  Future<List<SubscriptionModel>> getSubscriptionsByUserId(
+    String userId,
+  ) async {
     try {
       final snapshot = await _firestore
           .collection(AppConstants.collectionSubscriptions)
@@ -342,10 +357,7 @@ class AdminService {
 
       return snapshot.docs.map((doc) {
         final data = doc.data();
-        return SubscriptionModel.fromJson({
-          'id': doc.id,
-          ...data,
-        });
+        return SubscriptionModel.fromJson({'id': doc.id, ...data});
       }).toList();
     } catch (e) {
       if (kDebugMode) {
@@ -375,7 +387,10 @@ class AdminService {
   }
 
   /// Cancel subscription
-  Future<void> cancelSubscription(String subscriptionId, {String? reason}) async {
+  Future<void> cancelSubscription(
+    String subscriptionId, {
+    String? reason,
+  }) async {
     try {
       final subscription = await getSubscriptionById(subscriptionId);
       if (subscription == null) {
@@ -383,19 +398,25 @@ class AdminService {
       }
 
       // Update subscription
-      await _firestore.collection(AppConstants.collectionSubscriptions).doc(subscriptionId).update({
-        'status': AppConstants.subscriptionStatusCancelled,
-        'cancelledAt': FieldValue.serverTimestamp(),
-        'cancelReason': reason,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionSubscriptions)
+          .doc(subscriptionId)
+          .update({
+            'status': AppConstants.subscriptionStatusCancelled,
+            'cancelledAt': FieldValue.serverTimestamp(),
+            'cancelReason': reason,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
 
       // Update user's subscription status
-      await _firestore.collection(AppConstants.collectionUsers).doc(subscription.userId).update({
-        'isSubscribed': false,
-        'subscriptionStatus': AppConstants.subscriptionStatusCancelled,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionUsers)
+          .doc(subscription.userId)
+          .update({
+            'isSubscribed': false,
+            'subscriptionStatus': AppConstants.subscriptionStatusCancelled,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
       if (kDebugMode) {
         print('Error cancelling subscription: $e');
@@ -416,21 +437,27 @@ class AdminService {
       final endDate = subscription.endDate ?? now.add(const Duration(days: 30));
 
       // Update subscription
-      await _firestore.collection(AppConstants.collectionSubscriptions).doc(subscriptionId).update({
-        'status': AppConstants.subscriptionStatusActive,
-        'startDate': Timestamp.fromDate(now),
-        'endDate': Timestamp.fromDate(endDate),
-        'cancelledAt': FieldValue.delete(),
-        'cancelReason': FieldValue.delete(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionSubscriptions)
+          .doc(subscriptionId)
+          .update({
+            'status': AppConstants.subscriptionStatusActive,
+            'startDate': Timestamp.fromDate(now),
+            'endDate': Timestamp.fromDate(endDate),
+            'cancelledAt': FieldValue.delete(),
+            'cancelReason': FieldValue.delete(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
 
       // Update user's subscription status
-      await _firestore.collection(AppConstants.collectionUsers).doc(subscription.userId).update({
-        'isSubscribed': true,
-        'subscriptionStatus': AppConstants.subscriptionStatusActive,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.collectionUsers)
+          .doc(subscription.userId)
+          .update({
+            'isSubscribed': true,
+            'subscriptionStatus': AppConstants.subscriptionStatusActive,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
       if (kDebugMode) {
         print('Error reactivating subscription: $e');
@@ -448,27 +475,38 @@ class AdminService {
 
       final subscriptions = subscriptionsSnapshot.docs.map((doc) {
         final data = doc.data();
-        return SubscriptionModel.fromJson({
-          'id': doc.id,
-          ...data,
-        });
+        return SubscriptionModel.fromJson({'id': doc.id, ...data});
       }).toList();
 
-      final active = subscriptions.where((s) => s.status == AppConstants.subscriptionStatusActive).length;
-      final cancelled = subscriptions.where((s) => s.status == AppConstants.subscriptionStatusCancelled).length;
-      final expired = subscriptions.where((s) => s.status == AppConstants.subscriptionStatusExpired).length;
+      final active = subscriptions
+          .where((s) => s.status == AppConstants.subscriptionStatusActive)
+          .length;
+      final cancelled = subscriptions
+          .where((s) => s.status == AppConstants.subscriptionStatusCancelled)
+          .length;
+      final expired = subscriptions
+          .where((s) => s.status == AppConstants.subscriptionStatusExpired)
+          .length;
 
       final totalRevenue = subscriptions
-          .where((s) => s.price != null && s.status == AppConstants.subscriptionStatusActive)
+          .where(
+            (s) =>
+                s.price != null &&
+                s.status == AppConstants.subscriptionStatusActive,
+          )
           .fold<double>(0.0, (sum, s) => sum + (s.price ?? 0.0));
 
       final monthlyRevenue = subscriptions
           .where((s) {
-            if (s.price == null || s.status != AppConstants.subscriptionStatusActive) return false;
+            if (s.price == null ||
+                s.status != AppConstants.subscriptionStatusActive) {
+              return false;
+            }
             if (s.startDate == null) return false;
             final now = DateTime.now();
             final startOfMonth = DateTime(now.year, now.month, 1);
-            return s.startDate!.isAfter(startOfMonth) || s.startDate!.isAtSameMomentAs(startOfMonth);
+            return s.startDate!.isAfter(startOfMonth) ||
+                s.startDate!.isAtSameMomentAs(startOfMonth);
           })
           .fold<double>(0.0, (sum, s) => sum + (s.price ?? 0.0));
 
@@ -492,20 +530,21 @@ class AdminService {
   /// Get user analytics
   Future<Map<String, dynamic>> getUserAnalytics() async {
     try {
-      final usersSnapshot = await _firestore.collection(AppConstants.collectionUsers).get();
+      final usersSnapshot = await _firestore
+          .collection(AppConstants.collectionUsers)
+          .get();
 
       final users = usersSnapshot.docs.map((doc) {
         final data = doc.data();
-        return UserModel.fromJson({
-          'id': doc.id,
-          ...data,
-        });
+        return UserModel.fromJson({'id': doc.id, ...data});
       }).toList();
 
       final total = users.length;
       final subscribed = users.where((u) => u.isSubscribed).length;
       final blocked = users.where((u) => u.isBlocked).length;
-      final onboardingCompleted = users.where((u) => u.isOnboardingCompleted).length;
+      final onboardingCompleted = users
+          .where((u) => u.isOnboardingCompleted)
+          .length;
       final ageVerified = users.where((u) => u.isAgeVerified).length;
 
       final now = DateTime.now();
@@ -514,8 +553,12 @@ class AdminService {
       final thisMonth = DateTime(now.year, now.month, 1);
 
       final newToday = users.where((u) => u.createdAt.isAfter(today)).length;
-      final newThisWeek = users.where((u) => u.createdAt.isAfter(thisWeek)).length;
-      final newThisMonth = users.where((u) => u.createdAt.isAfter(thisMonth)).length;
+      final newThisWeek = users
+          .where((u) => u.createdAt.isAfter(thisWeek))
+          .length;
+      final newThisMonth = users
+          .where((u) => u.createdAt.isAfter(thisMonth))
+          .length;
 
       return {
         'totalUsers': total,
@@ -535,4 +578,3 @@ class AdminService {
     }
   }
 }
-

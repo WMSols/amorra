@@ -51,4 +51,3 @@ class ProfileSetupFormSection extends StatelessWidget {
     );
   }
 }
-

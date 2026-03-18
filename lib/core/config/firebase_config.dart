@@ -9,9 +9,7 @@ class FirebaseConfig {
   /// Call this in main.dart before runApp()
   static Future<void> initialize() async {
     try {
-      await Firebase.initializeApp(
-        options: _getFirebaseOptions(),
-      );
+      await Firebase.initializeApp(options: _getFirebaseOptions());
       if (kDebugMode) {
         debugPrint('Firebase initialized successfully');
       }
@@ -36,4 +34,3 @@ class FirebaseConfig {
     }
   }
 }
-

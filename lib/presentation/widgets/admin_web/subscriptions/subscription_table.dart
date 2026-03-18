@@ -86,15 +86,15 @@ class SubscriptionTable extends StatelessWidget {
       final userInfoData = userInfo[subscription.userId];
       final userName = userInfoData?['name'];
       final userEmail = userInfoData?['email'];
-      
+
       return DataRow(
         cells: [
           DataCell(
             Text(
               userName ?? '-',
-              style: WebTextStyles.tableCell(context).copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: WebTextStyles.tableCell(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -108,9 +108,9 @@ class SubscriptionTable extends StatelessWidget {
           DataCell(
             Text(
               subscription.planName ?? WebTexts.subscriptionDetailsNA,
-              style: WebTextStyles.tableCell(context).copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: WebTextStyles.tableCell(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -165,16 +165,10 @@ class SubscriptionTable extends StatelessWidget {
     return WebCard(
       padding: EdgeInsets.zero,
       child: WebResponsive.isDesktop(context)
-          ? WebDataTable(
-              columns: columns,
-              rows: rows,
-            )
+          ? WebDataTable(columns: columns, rows: rows)
           : SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: WebDataTable(
-                columns: columns,
-                rows: rows,
-              ),
+              child: WebDataTable(columns: columns, rows: rows),
             ),
     );
   }
@@ -196,4 +190,3 @@ class SubscriptionTable extends StatelessWidget {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
-

@@ -27,14 +27,21 @@ class AIService {
     try {
       // Get API key from environment variables
       final apiKey = dotenv.env['AI_API_KEY'] ?? '';
-      if (apiKey.isEmpty || apiKey == 'YOUR_API_KEY_HERE' || apiKey == 'your_openai_api_key_here') {
+      if (apiKey.isEmpty ||
+          apiKey == 'YOUR_API_KEY_HERE' ||
+          apiKey == 'your_openai_api_key_here') {
         if (kDebugMode) {
-          print('⚠️ AI_API_KEY not configured. Please add your API key to .env file.');
+          print(
+            '⚠️ AI_API_KEY not configured. Please add your API key to .env file.',
+          );
         }
-        throw Exception('AI API key not configured. Please add AI_API_KEY to your .env file.');
+        throw Exception(
+          'AI API key not configured. Please add AI_API_KEY to your .env file.',
+        );
       }
 
-      final baseUrl = dotenv.env['AI_API_BASE_URL'] ?? ApiConstants.aiApiBaseUrl;
+      final baseUrl =
+          dotenv.env['AI_API_BASE_URL'] ?? ApiConstants.aiApiBaseUrl;
       final url = Uri.parse('$baseUrl${ApiConstants.endpointChat}');
 
       // Prepare messages for context
@@ -66,8 +73,10 @@ class AIService {
             body: jsonEncode({
               'model': dotenv.env['AI_MODEL'] ?? 'gpt-3.5-turbo',
               'messages': messages,
-              'temperature': double.tryParse(dotenv.env['AI_TEMPERATURE'] ?? '0.7') ?? 0.7,
-              'max_tokens': int.tryParse(dotenv.env['AI_MAX_TOKENS'] ?? '500') ?? 500,
+              'temperature':
+                  double.tryParse(dotenv.env['AI_TEMPERATURE'] ?? '0.7') ?? 0.7,
+              'max_tokens':
+                  int.tryParse(dotenv.env['AI_MAX_TOKENS'] ?? '500') ?? 500,
             }),
           )
           .timeout(AppConfig.aiResponseTimeout);

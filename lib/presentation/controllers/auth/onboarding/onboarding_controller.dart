@@ -106,4 +106,3 @@ class OnboardingController extends BaseController {
   /// Check if current page is last page
   bool get isLastPage => currentPage.value == totalPages - 1;
 }
-

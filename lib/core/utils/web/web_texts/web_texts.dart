@@ -14,7 +14,8 @@ class WebTexts {
   static const String adminSignInButton = "Sign In";
   static const String adminSigningIn = "Signing in...";
   static const String adminSignOut = "Sign Out";
-  static const String adminSignOutConfirm = "Are you sure you want to sign out?";
+  static const String adminSignOutConfirm =
+      "Are you sure you want to sign out?";
 
   // Navigation
   static const String navUsers = "Users";
@@ -34,9 +35,12 @@ class WebTexts {
   static const String usersUnblock = "Unblock";
   static const String usersGrantTrial = "Grant Free Trial";
   static const String usersDelete = "Delete";
-  static const String usersBlockConfirm = "Are you sure you want to block this user?";
-  static const String usersUnblockConfirm = "Are you sure you want to unblock this user?";
-  static const String usersDeleteConfirm = "Are you sure you want to delete this user? This action cannot be undone.";
+  static const String usersBlockConfirm =
+      "Are you sure you want to block this user?";
+  static const String usersUnblockConfirm =
+      "Are you sure you want to unblock this user?";
+  static const String usersDeleteConfirm =
+      "Are you sure you want to delete this user? This action cannot be undone.";
   static const String usersTrialDays = "Days";
   static const String usersTrialGrant = "Grant";
   static const String usersTrialCancel = "Cancel";
@@ -58,8 +62,10 @@ class WebTexts {
 
   // Subscription Management
   static const String subscriptionsTitle = "Subscription Management";
-  static const String subscriptionsSearchHint = "Search by subscription ID, user ID, or Stripe ID...";
-  static const String subscriptionsNoSubscriptionsFound = "No subscriptions found";
+  static const String subscriptionsSearchHint =
+      "Search by subscription ID, user ID, or Stripe ID...";
+  static const String subscriptionsNoSubscriptionsFound =
+      "No subscriptions found";
   static const String subscriptionsFilterAll = "All";
   static const String subscriptionsFilterActive = "Active";
   static const String subscriptionsFilterCancelled = "Cancelled";
@@ -67,10 +73,13 @@ class WebTexts {
   static const String subscriptionsViewDetails = "View Details";
   static const String subscriptionsCancel = "Cancel";
   static const String subscriptionsReactivate = "Reactivate";
-  static const String subscriptionsCancelConfirm = "Are you sure you want to cancel this subscription?";
-  static const String subscriptionsReactivateConfirm = "Are you sure you want to reactivate this subscription?";
+  static const String subscriptionsCancelConfirm =
+      "Are you sure you want to cancel this subscription?";
+  static const String subscriptionsReactivateConfirm =
+      "Are you sure you want to reactivate this subscription?";
   static const String subscriptionsCancelReason = "Reason (optional)";
-  static const String subscriptionsCancelReasonHint = "Enter cancellation reason...";
+  static const String subscriptionsCancelReasonHint =
+      "Enter cancellation reason...";
   static const String subscriptionsConfirmCancel = "Confirm Cancel";
   static const String subscriptionsClose = "Close";
 
@@ -84,8 +93,10 @@ class WebTexts {
   static const String subscriptionDetailsStartDate = "Start Date";
   static const String subscriptionDetailsEndDate = "End Date";
   static const String subscriptionDetailsCancelledAt = "Cancelled At";
-  static const String subscriptionDetailsStripeSubscriptionId = "Stripe Subscription ID";
-  static const String subscriptionDetailsStripeCustomerId = "Stripe Customer ID";
+  static const String subscriptionDetailsStripeSubscriptionId =
+      "Stripe Subscription ID";
+  static const String subscriptionDetailsStripeCustomerId =
+      "Stripe Customer ID";
   static const String subscriptionDetailsCreated = "Created";
   static const String subscriptionDetailsUpdated = "Updated";
   static const String subscriptionDetailsNA = "N/A";
@@ -123,7 +134,8 @@ class WebTexts {
   static const String messageNoData = "No data available";
   static const String messageError = "An error occurred";
   static const String messageSuccess = "Operation completed successfully";
-  static const String messageValidationError = "Please fill in all required fields";
+  static const String messageValidationError =
+      "Please fill in all required fields";
 
   // Table Headers
   static const String tableHeaderName = "Name";
@@ -137,4 +149,3 @@ class WebTexts {
   static const String tableHeaderEndDate = "End Date";
   static const String tableHeaderUser = "User";
 }
-

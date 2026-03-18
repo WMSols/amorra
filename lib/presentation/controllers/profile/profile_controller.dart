@@ -33,7 +33,7 @@ class ProfileController extends BaseController {
   final TextEditingController nameController = TextEditingController();
   final RxBool isLogoutLoading = false.obs;
   final RxBool isDeleteAccountLoading = false.obs;
-  
+
   // Image upload state
   final RxBool isUploadingImage = false.obs;
   final RxInt currentImageIndex = 0.obs; // 0 = avatar, 1 = profile image
@@ -113,13 +113,15 @@ class ProfileController extends BaseController {
           user.value = updatedUser;
           editedName.value = updatedUser.name;
           nameController.text = updatedUser.name;
-          
+
           // Only update image index if user actually changed (to avoid overwriting during delete)
-          final oldHasImage = oldUser?.profileImageUrl != null && 
+          final oldHasImage =
+              oldUser?.profileImageUrl != null &&
               oldUser!.profileImageUrl!.isNotEmpty;
-          final newHasImage = updatedUser.profileImageUrl != null && 
+          final newHasImage =
+              updatedUser.profileImageUrl != null &&
               updatedUser.profileImageUrl!.isNotEmpty;
-          
+
           // Update image index based on profile image availability
           // But only if the profile image status actually changed
           if (oldHasImage != newHasImage) {
@@ -195,8 +197,8 @@ class ProfileController extends BaseController {
     }
 
     final currentUser = user.value;
-    final isInTrial = currentUser != null &&
-        FreeTrialUtils.isWithinFreeTrial(currentUser);
+    final isInTrial =
+        currentUser != null && FreeTrialUtils.isWithinFreeTrial(currentUser);
 
     // If in free trial, return unlimited indicator
     if (isInTrial) {
@@ -435,7 +437,7 @@ class ProfileController extends BaseController {
           showError(
             'Invalid Password',
             subtitle:
-            'The password you entered is incorrect. Please try again.',
+                'The password you entered is incorrect. Please try again.',
           );
         } else {
           showError(
@@ -494,8 +496,8 @@ class ProfileController extends BaseController {
     if (isSubscribed) return 0;
 
     final currentUser = user.value;
-    final isInTrial = currentUser != null &&
-        FreeTrialUtils.isWithinFreeTrial(currentUser);
+    final isInTrial =
+        currentUser != null && FreeTrialUtils.isWithinFreeTrial(currentUser);
 
     // If in free trial, return 0 (no usage tracking)
     if (isInTrial) return 0;
@@ -509,8 +511,8 @@ class ProfileController extends BaseController {
     if (isSubscribed) return 999;
 
     final currentUser = user.value;
-    final isInTrial = currentUser != null &&
-        FreeTrialUtils.isWithinFreeTrial(currentUser);
+    final isInTrial =
+        currentUser != null && FreeTrialUtils.isWithinFreeTrial(currentUser);
 
     // If in free trial, return unlimited indicator
     if (isInTrial) return 999;
@@ -623,7 +625,7 @@ class ProfileController extends BaseController {
 
       // Update local user value for immediate UI update
       user.value = updatedUser;
-      
+
       // Switch to profile image view after upload
       currentImageIndex.value = 1;
       _updatePageController();
@@ -710,7 +712,7 @@ class ProfileController extends BaseController {
 
       // Update local user value for immediate UI update
       user.value = updatedUser;
-      
+
       // Switch back to avatar view immediately
       currentImageIndex.value = 0;
       _updatePageController();

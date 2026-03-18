@@ -42,9 +42,9 @@ class ProfileScreen extends GetView<ProfileController> {
                 AppSpacing.vertical(context, 0.02),
                 Text(
                   'No user data available',
-                  style: AppTextStyles.bodyText(context).copyWith(
-                    color: AppColors.grey,
-                  ),
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(color: AppColors.grey),
                 ),
               ],
             ),
@@ -57,14 +57,22 @@ class ProfileScreen extends GetView<ProfileController> {
               children: [
                 // Fixed Header
                 Padding(
-                  padding: AppSpacing.symmetric(context, h: 0.04, v: 0.02).copyWith(bottom: 0),
+                  padding: AppSpacing.symmetric(
+                    context,
+                    h: 0.04,
+                    v: 0.02,
+                  ).copyWith(bottom: 0),
                   child: const AppScreenHeader(title: AppTexts.profileTitle),
                 ),
 
                 // Scrollable Content
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: AppSpacing.symmetric(context, h: 0.04, v: 0.02).copyWith(top: 0),
+                    padding: AppSpacing.symmetric(
+                      context,
+                      h: 0.04,
+                      v: 0.02,
+                    ).copyWith(top: 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -82,15 +90,18 @@ class ProfileScreen extends GetView<ProfileController> {
                         AppSpacing.vertical(context, 0.02),
 
                         // Subscription Card
-                        Obx(() => ProfileSubscriptionCard(
-                              isSubscribed: controller.isSubscribed,
-                              remainingMessages: controller.remainingFreeMessagesReactive.value,
-                              usedMessages: controller.usedMessages,
-                              dailyLimit: controller.dailyLimit,
-                              nextBillingDate: controller.nextBillingDate,
-                              onUpgradeTap: controller.navigateToSubscription,
-                              onManageTap: controller.navigateToSubscription,
-                            )),
+                        Obx(
+                          () => ProfileSubscriptionCard(
+                            isSubscribed: controller.isSubscribed,
+                            remainingMessages:
+                                controller.remainingFreeMessagesReactive.value,
+                            usedMessages: controller.usedMessages,
+                            dailyLimit: controller.dailyLimit,
+                            nextBillingDate: controller.nextBillingDate,
+                            onUpgradeTap: controller.navigateToSubscription,
+                            onManageTap: controller.navigateToSubscription,
+                          ),
+                        ),
                         AppSpacing.vertical(context, 0.02),
 
                         // Safety Section
@@ -98,12 +109,15 @@ class ProfileScreen extends GetView<ProfileController> {
                         AppSpacing.vertical(context, 0.02),
 
                         // Action Buttons
-                        Obx(() => ProfileActionButtons(
-                              onLogout: controller.logout,
-                              onDeleteAccount: controller.deleteAccount,
-                              isLogoutLoading: controller.isLogoutLoading.value,
-                              isDeleteAccountLoading: controller.isDeleteAccountLoading.value,
-                            )),
+                        Obx(
+                          () => ProfileActionButtons(
+                            onLogout: controller.logout,
+                            onDeleteAccount: controller.deleteAccount,
+                            isLogoutLoading: controller.isLogoutLoading.value,
+                            isDeleteAccountLoading:
+                                controller.isDeleteAccountLoading.value,
+                          ),
+                        ),
                       ],
                     ),
                   ),

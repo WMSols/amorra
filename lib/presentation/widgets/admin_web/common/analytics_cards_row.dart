@@ -7,10 +7,7 @@ import 'package:amorra/core/utils/web/web_spacing/web_spacing.dart';
 class AnalyticsCardsRow extends StatelessWidget {
   final List<AnalyticsCardItem> cards;
 
-  const AnalyticsCardsRow({
-    super.key,
-    required this.cards,
-  });
+  const AnalyticsCardsRow({super.key, required this.cards});
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +28,10 @@ class AnalyticsCardsRow extends StatelessWidget {
 
 /// Analytics Card Item Model
 class AnalyticsCardItem extends WebAnalyticsCard {
-  const AnalyticsCardItem({
+  const AnalyticsCardItem({super.key, 
     required super.label,
     required super.value,
     required super.color,
     super.icon,
   });
 }
-

@@ -56,7 +56,7 @@ class _ChatProcessingMessagesState extends State<ChatProcessingMessages> {
       color: AppColors.grey,
       fontSize: AppResponsive.scaleSize(context, 12),
     );
-    
+
     // Find the longest message to set consistent width
     double maxWidth = 0;
     for (final message in _processingMessages) {
@@ -83,19 +83,16 @@ class _ChatProcessingMessagesState extends State<ChatProcessingMessages> {
           final fadeAnimation = Tween<double>(
             begin: 0.0,
             end: 1.0,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOut,
-          ));
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
 
           // Smooth slide transition from left side
-          final slideAnimation = Tween<Offset>(
-            begin: const Offset(-0.3, 0), // Slide in from left
-            end: Offset.zero, // End at left position
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-          ));
+          final slideAnimation =
+              Tween<Offset>(
+                begin: const Offset(-0.3, 0), // Slide in from left
+                end: Offset.zero, // End at left position
+              ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              );
 
           // Combine fade and slide for smooth transition
           return FadeTransition(

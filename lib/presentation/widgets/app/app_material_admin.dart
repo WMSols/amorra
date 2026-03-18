@@ -40,4 +40,3 @@ class AppMaterialAdmin extends StatelessWidget {
     );
   }
 }
-

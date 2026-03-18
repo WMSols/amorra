@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:get/get.dart';
 import 'package:amorra/presentation/widgets/admin_web/common/web_button.dart';
 import 'package:amorra/core/utils/web/web_responsive/web_responsive.dart';
@@ -213,7 +212,7 @@ class WebAlertDialog extends StatelessWidget {
                 WebResponsive.isDesktop(context) ? 12 : 10,
               ),
               decoration: BoxDecoration(
-                color: AppColors.white.withOpacity(0.2),
+                color: AppColors.white.withValues(alpha:0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -317,7 +316,7 @@ class WebAlertDialog extends StatelessWidget {
     return Container(
       padding: WebSpacing.all(context, factor: 2.0),
       decoration: BoxDecoration(
-        color: AppColors.lightGrey.withOpacity(0.3),
+        color: AppColors.lightGrey.withValues(alpha:0.3),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(
             WebResponsive.radius(context, factor: 1.5),

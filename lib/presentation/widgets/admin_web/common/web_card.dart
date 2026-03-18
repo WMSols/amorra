@@ -35,14 +35,11 @@ class WebCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           WebResponsive.radius(context, factor: 1.0),
         ),
-        border: Border.all(
-          color:borderColor ?? AppColors.lightGrey,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor ?? AppColors.lightGrey, width: 1),
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha:0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -65,4 +62,3 @@ class WebCard extends StatelessWidget {
     return cardContent;
   }
 }
-

@@ -15,10 +15,7 @@ import 'package:amorra/core/config/routes.dart';
 class AuthFooter extends StatelessWidget {
   final AuthFooterType type;
 
-  const AuthFooter({
-    super.key,
-    required this.type,
-  });
+  const AuthFooter({super.key, required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -39,21 +36,21 @@ class AuthFooter extends StatelessWidget {
             context,
           ).copyWith(color: AppColors.grey),
           children: [
-                TextSpan(text: AppTexts.dontHaveAccount),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.baseline,
-                  baseline: TextBaseline.alphabetic,
-                  child: GestureDetector(
-                    onTap: () => Get.offAllNamed(AppRoutes.signup),
-                    child: Text(
-                      AppTexts.registerLink,
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+            TextSpan(text: AppTexts.dontHaveAccount),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.baseline,
+              baseline: TextBaseline.alphabetic,
+              child: GestureDetector(
+                onTap: () => Get.offAllNamed(AppRoutes.signup),
+                child: Text(
+                  AppTexts.registerLink,
+                  style: AppTextStyles.bodyText(context).copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
+            ),
           ],
         ),
       ),
@@ -138,7 +135,7 @@ class AuthFooter extends StatelessWidget {
                     onTap: () => Get.offAllNamed(AppRoutes.signin),
                     child: Text(
                       AppTexts.loginLink,
-                      style: TextStyle(
+                      style: AppTextStyles.bodyText(context).copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
                       ),
@@ -155,8 +152,4 @@ class AuthFooter extends StatelessWidget {
 }
 
 /// Auth Footer Type
-enum AuthFooterType {
-  signin,
-  signup,
-}
-
+enum AuthFooterType { signin, signup }

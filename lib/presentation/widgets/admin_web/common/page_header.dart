@@ -29,10 +29,7 @@ class PageHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: WebTextStyles.heading(context),
-          ),
+          Text(title, style: WebTextStyles.heading(context)),
           WebSpacing.medium(context),
           // Search Bar
           WebSearchBar(
@@ -50,4 +47,3 @@ class PageHeader extends StatelessWidget {
     );
   }
 }
-

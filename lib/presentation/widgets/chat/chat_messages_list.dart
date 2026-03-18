@@ -13,10 +13,7 @@ import 'package:amorra/core/constants/app_constants.dart';
 class ChatMessagesList extends StatelessWidget {
   final ChatController controller;
 
-  const ChatMessagesList({
-    super.key,
-    required this.controller,
-  });
+  const ChatMessagesList({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -88,14 +85,16 @@ class ChatMessagesList extends StatelessWidget {
           padding: EdgeInsets.only(
             bottom: AppResponsive.screenHeight(context) * 0.015,
           ),
-          child: Obx(() => ChatMessageBubble(
-            message: message.message,
-            type: message.type,
-            timestamp: message.timestamp,
-            showTimestamp: true, // Always show timestamp
-            userAge: controller.userAge,
-            profileImageUrl: controller.profileImageUrl,
-          )),
+          child: Obx(
+            () => ChatMessageBubble(
+              message: message.message,
+              type: message.type,
+              timestamp: message.timestamp,
+              showTimestamp: true, // Always show timestamp
+              userAge: controller.userAge,
+              profileImageUrl: controller.profileImageUrl,
+            ),
+          ),
         ),
       );
     }

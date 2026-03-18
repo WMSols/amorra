@@ -44,9 +44,7 @@ class UserList extends StatelessWidget {
                     radius: WebResponsive.isDesktop(context) ? 24 : 20,
                     backgroundColor: AppColors.primary,
                     child: Text(
-                      user.name.isNotEmpty
-                          ? user.name[0].toUpperCase()
-                          : 'U',
+                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                       style: WebTextStyles.bodyText(context).copyWith(
                         color: AppColors.white,
                         fontWeight: FontWeight.bold,
@@ -60,9 +58,9 @@ class UserList extends StatelessWidget {
                       children: [
                         Text(
                           user.name,
-                          style: WebTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: WebTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         if (user.email != null)
                           Text(
@@ -114,4 +112,3 @@ class UserList extends StatelessWidget {
     }
   }
 }
-

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// Supports: **bold**, *italic*, `code`, ~~strikethrough~~
 class TextFormatter {
   /// Parse text with markdown-like formatting and return TextSpan
-  /// 
+  ///
   /// Supported formats:
   /// - `**text**` or `__text__` for bold
   /// - `*text*` or `_text_` for italic (single asterisk/underscore, not part of bold)
@@ -21,14 +21,17 @@ class TextFormatter {
   }) {
     // Default styles if not provided
     final bold = boldStyle ?? baseStyle.copyWith(fontWeight: FontWeight.bold);
-    final italic = italicStyle ?? baseStyle.copyWith(fontStyle: FontStyle.italic);
-    final code = codeStyle ?? baseStyle.copyWith(
-      fontFamily: 'monospace',
-      backgroundColor: baseStyle.color?.withOpacity(0.1),
-    );
-    final strikethrough = strikethroughStyle ?? baseStyle.copyWith(
-      decoration: TextDecoration.lineThrough,
-    );
+    final italic =
+        italicStyle ?? baseStyle.copyWith(fontStyle: FontStyle.italic);
+    final code =
+        codeStyle ??
+        baseStyle.copyWith(
+          fontFamily: 'monospace',
+          backgroundColor: baseStyle.color?.withValues(alpha:0.1),
+        );
+    final strikethrough =
+        strikethroughStyle ??
+        baseStyle.copyWith(decoration: TextDecoration.lineThrough);
 
     // Parse using a recursive approach to handle nested formatting
     return _parseText(text, baseStyle, bold, italic, code, strikethrough);
@@ -108,14 +111,18 @@ class TextFormatter {
       final italicAsteriskMatch = text.indexOf('*', index);
       if (italicAsteriskMatch != -1) {
         // Make sure it's not part of ** (check before and after)
-        final isNotBoldStart = italicAsteriskMatch == 0 || text[italicAsteriskMatch - 1] != '*';
-        final isNotBoldEnd = italicAsteriskMatch >= text.length - 1 || text[italicAsteriskMatch + 1] != '*';
-        
+        final isNotBoldStart =
+            italicAsteriskMatch == 0 || text[italicAsteriskMatch - 1] != '*';
+        final isNotBoldEnd =
+            italicAsteriskMatch >= text.length - 1 ||
+            text[italicAsteriskMatch + 1] != '*';
+
         if (isNotBoldStart && isNotBoldEnd) {
           final endIndex = text.indexOf('*', italicAsteriskMatch + 1);
           if (endIndex != -1) {
             // Make sure the closing * is not part of **
-            final isNotBoldEndClose = endIndex >= text.length - 1 || text[endIndex + 1] != '*';
+            final isNotBoldEndClose =
+                endIndex >= text.length - 1 || text[endIndex + 1] != '*';
             if (isNotBoldEndClose) {
               if (nextMatch == null || italicAsteriskMatch < nextMatch) {
                 nextMatch = italicAsteriskMatch;
@@ -131,14 +138,19 @@ class TextFormatter {
       final italicUnderscoreMatch = text.indexOf('_', index);
       if (italicUnderscoreMatch != -1) {
         // Make sure it's not part of __ (check before and after)
-        final isNotBoldStart = italicUnderscoreMatch == 0 || text[italicUnderscoreMatch - 1] != '_';
-        final isNotBoldEnd = italicUnderscoreMatch >= text.length - 1 || text[italicUnderscoreMatch + 1] != '_';
-        
+        final isNotBoldStart =
+            italicUnderscoreMatch == 0 ||
+            text[italicUnderscoreMatch - 1] != '_';
+        final isNotBoldEnd =
+            italicUnderscoreMatch >= text.length - 1 ||
+            text[italicUnderscoreMatch + 1] != '_';
+
         if (isNotBoldStart && isNotBoldEnd) {
           final endIndex = text.indexOf('_', italicUnderscoreMatch + 1);
           if (endIndex != -1) {
             // Make sure the closing _ is not part of __
-            final isNotBoldEndClose = endIndex >= text.length - 1 || text[endIndex + 1] != '_';
+            final isNotBoldEndClose =
+                endIndex >= text.length - 1 || text[endIndex + 1] != '_';
             if (isNotBoldEndClose) {
               if (nextMatch == null || italicUnderscoreMatch < nextMatch) {
                 nextMatch = italicUnderscoreMatch;
@@ -160,30 +172,48 @@ class TextFormatter {
         // Extract and parse the matched content
         String content;
         TextStyle style;
-        
+
         switch (matchType) {
           case 'bold_asterisk':
-            content = text.substring(nextMatch + 2, nextMatch + matchLength - 2);
+            content = text.substring(
+              nextMatch + 2,
+              nextMatch + matchLength - 2,
+            );
             style = boldStyle;
             break;
           case 'bold_underscore':
-            content = text.substring(nextMatch + 2, nextMatch + matchLength - 2);
+            content = text.substring(
+              nextMatch + 2,
+              nextMatch + matchLength - 2,
+            );
             style = boldStyle;
             break;
           case 'strikethrough':
-            content = text.substring(nextMatch + 2, nextMatch + matchLength - 2);
+            content = text.substring(
+              nextMatch + 2,
+              nextMatch + matchLength - 2,
+            );
             style = strikethroughStyle;
             break;
           case 'code':
-            content = text.substring(nextMatch + 1, nextMatch + matchLength - 1);
+            content = text.substring(
+              nextMatch + 1,
+              nextMatch + matchLength - 1,
+            );
             style = codeStyle;
             break;
           case 'italic_asterisk':
-            content = text.substring(nextMatch + 1, nextMatch + matchLength - 1);
+            content = text.substring(
+              nextMatch + 1,
+              nextMatch + matchLength - 1,
+            );
             style = italicStyle;
             break;
           case 'italic_underscore':
-            content = text.substring(nextMatch + 1, nextMatch + matchLength - 1);
+            content = text.substring(
+              nextMatch + 1,
+              nextMatch + matchLength - 1,
+            );
             style = italicStyle;
             break;
           default:
@@ -194,7 +224,7 @@ class TextFormatter {
         // Recursively parse nested formatting
         // Use the matched style as base, but allow nested formatting
         final nestedSpan = _parseText(
-          content, 
+          content,
           style, // Use the matched style as base
           boldStyle.copyWith(color: style.color), // Preserve color from parent
           italicStyle.copyWith(color: style.color),
@@ -219,11 +249,12 @@ class TextFormatter {
     }
 
     // If only one span and it's plain text, return it directly
-    if (spans.length == 1 && spans[0].style == baseStyle && spans[0].children == null) {
+    if (spans.length == 1 &&
+        spans[0].style == baseStyle &&
+        spans[0].children == null) {
       return spans[0];
     }
 
     return TextSpan(children: spans);
   }
 }
-

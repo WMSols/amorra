@@ -71,9 +71,7 @@ class UserTable extends StatelessWidget {
                   radius: WebResponsive.isDesktop(context) ? 20 : 16,
                   backgroundColor: AppColors.primary,
                   child: Text(
-                    user.name.isNotEmpty
-                        ? user.name[0].toUpperCase()
-                        : 'U',
+                    user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                     style: WebTextStyles.bodyText(context).copyWith(
                       color: AppColors.white,
                       fontWeight: FontWeight.bold,
@@ -84,9 +82,9 @@ class UserTable extends StatelessWidget {
                 Expanded(
                   child: Text(
                     user.name,
-                    style: WebTextStyles.tableCell(context).copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: WebTextStyles.tableCell(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w600),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -142,16 +140,10 @@ class UserTable extends StatelessWidget {
     return WebCard(
       padding: EdgeInsets.zero,
       child: WebResponsive.isDesktop(context)
-          ? WebDataTable(
-              columns: columns,
-              rows: rows,
-            )
+          ? WebDataTable(columns: columns, rows: rows)
           : SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: WebDataTable(
-                columns: columns,
-                rows: rows,
-              ),
+              child: WebDataTable(columns: columns, rows: rows),
             ),
     );
   }
@@ -173,4 +165,3 @@ class UserTable extends StatelessWidget {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 }
-

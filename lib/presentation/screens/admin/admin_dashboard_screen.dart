@@ -28,7 +28,7 @@ class AdminDashboardScreen extends GetView<AdminAuthController> {
 
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: AppColors.lightGrey.withOpacity(0.3),
+      backgroundColor: AppColors.lightGrey.withValues(alpha:0.3),
       appBar: AppBar(
         title: Text(
           WebTexts.adminDashboard,

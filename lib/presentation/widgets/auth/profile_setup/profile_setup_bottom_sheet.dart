@@ -34,71 +34,67 @@ class ProfileSetupBottomSheet extends GetView<ProfileSetupController> {
             ),
             child: Column(
               children: [
-            // Handle bar
-            Container(
-              margin: EdgeInsets.only(
-                top: AppResponsive.screenHeight(context) * 0.01,
-                bottom: AppResponsive.screenHeight(context) * 0.01,
-              ),
-              width: AppResponsive.screenWidth(context) * 0.15,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.grey.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            // Header with title, subtitle, and close button
-            Padding(
-              padding: AppSpacing.symmetric(
-                context,
-                h: 0.04,
-                v: 0.02,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title and Subtitle
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppTexts.profileSetupUpdateTitle,
-                          style: AppTextStyles.headline(context).copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.black,
-                            fontSize: AppResponsive.scaleSize(context, 24),
-                            height: 1.3
-                          ),
-                        ),
-                        AppSpacing.vertical(context, 0.005),
-                        Text(
-                          AppTexts.profileSetupUpdateSubtitle,
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            color: AppColors.grey,
-                            fontSize: AppResponsive.scaleSize(context, 14),
-                            height: 1.3
-                          ),
-                        ),
-                      ],
-                    ),
+                // Handle bar
+                Container(
+                  margin: EdgeInsets.only(
+                    top: AppResponsive.screenHeight(context) * 0.01,
+                    bottom: AppResponsive.screenHeight(context) * 0.01,
                   ),
-
-                  // Close button
-                  IconButton(
-                    icon: Icon(
-                      Iconsax.close_circle,
-                      color: AppColors.black,
-                      size: AppResponsive.iconSize(context, factor: 1.5),
-                    ),
-                    onPressed: () => Get.back(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  width: AppResponsive.screenWidth(context) * 0.15,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                ],
-              ),
-            ),
+                ),
+
+                // Header with title, subtitle, and close button
+                Padding(
+                  padding: AppSpacing.symmetric(context, h: 0.04, v: 0.02),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title and Subtitle
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppTexts.profileSetupUpdateTitle,
+                              style: AppTextStyles.headline(context).copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.black,
+                                fontSize: AppResponsive.scaleSize(context, 24),
+                                height: 1.3,
+                              ),
+                            ),
+                            AppSpacing.vertical(context, 0.005),
+                            Text(
+                              AppTexts.profileSetupUpdateSubtitle,
+                              style: AppTextStyles.bodyText(context).copyWith(
+                                color: AppColors.grey,
+                                fontSize: AppResponsive.scaleSize(context, 14),
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Close button
+                      IconButton(
+                        icon: Icon(
+                          Iconsax.close_circle,
+                          color: AppColors.black,
+                          size: AppResponsive.iconSize(context, factor: 1.5),
+                        ),
+                        onPressed: () => Get.back(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
 
                 // Form content
                 Expanded(child: ProfileSetupFormContent(showSaveButton: true)),

@@ -32,40 +32,42 @@ class AdminUsersScreen extends GetView<AdminUserController> {
       children: [
         // Header Section (Fixed at top)
         PageHeader(
-            title: WebTexts.usersTitle,
-            searchHint: WebTexts.usersSearchHint,
-            searchController: searchController,
-            onSearchChanged: (value) {
-              controller.searchQuery.value = value;
-              if (value.isEmpty) {
-                controller.loadUsers();
-              }
-            },
-            filterChips: Obx(() => FilterChipsRow(
-                  chips: [
-                    FilterChipItem(
-                      label: WebTexts.usersFilterAll,
-                      isSelected: controller.selectedFilter.value == 'all',
-                      onTap: () => controller.setFilter('all'),
-                    ),
-                    FilterChipItem(
-                      label: WebTexts.usersFilterBlocked,
-                      isSelected: controller.selectedFilter.value == 'blocked',
-                      onTap: () => controller.setFilter('blocked'),
-                    ),
-                    FilterChipItem(
-                      label: WebTexts.usersFilterSubscribed,
-                      isSelected: controller.selectedFilter.value == 'subscribed',
-                      onTap: () => controller.setFilter('subscribed'),
-                    ),
-                    FilterChipItem(
-                      label: WebTexts.usersFilterFree,
-                      isSelected: controller.selectedFilter.value == 'free',
-                      onTap: () => controller.setFilter('free'),
-                    ),
-                  ],
-                )),
+          title: WebTexts.usersTitle,
+          searchHint: WebTexts.usersSearchHint,
+          searchController: searchController,
+          onSearchChanged: (value) {
+            controller.searchQuery.value = value;
+            if (value.isEmpty) {
+              controller.loadUsers();
+            }
+          },
+          filterChips: Obx(
+            () => FilterChipsRow(
+              chips: [
+                FilterChipItem(
+                  label: WebTexts.usersFilterAll,
+                  isSelected: controller.selectedFilter.value == 'all',
+                  onTap: () => controller.setFilter('all'),
+                ),
+                FilterChipItem(
+                  label: WebTexts.usersFilterBlocked,
+                  isSelected: controller.selectedFilter.value == 'blocked',
+                  onTap: () => controller.setFilter('blocked'),
+                ),
+                FilterChipItem(
+                  label: WebTexts.usersFilterSubscribed,
+                  isSelected: controller.selectedFilter.value == 'subscribed',
+                  onTap: () => controller.setFilter('subscribed'),
+                ),
+                FilterChipItem(
+                  label: WebTexts.usersFilterFree,
+                  isSelected: controller.selectedFilter.value == 'free',
+                  onTap: () => controller.setFilter('free'),
+                ),
+              ],
+            ),
           ),
+        ),
 
         WebSpacing.section(context),
 
@@ -114,18 +116,12 @@ class AdminUsersScreen extends GetView<AdminUserController> {
       detailRows: [
         DetailRow(
           label: WebTexts.userDetailsName,
-          value: Text(
-            user.name,
-            style: WebTextStyles.bodyText(context),
-          ),
+          value: Text(user.name, style: WebTextStyles.bodyText(context)),
         ),
         if (user.email != null)
           DetailRow(
             label: WebTexts.userDetailsEmail,
-            value: Text(
-              user.email!,
-              style: WebTextStyles.bodyText(context),
-            ),
+            value: Text(user.email!, style: WebTextStyles.bodyText(context)),
           ),
         if (user.age != null)
           DetailRow(
@@ -137,10 +133,7 @@ class AdminUsersScreen extends GetView<AdminUserController> {
           ),
         DetailRow(
           label: WebTexts.userDetailsUserId,
-          value: Text(
-            user.id,
-            style: WebTextStyles.bodyText(context),
-          ),
+          value: Text(user.id, style: WebTextStyles.bodyText(context)),
         ),
         DetailRow(
           label: WebTexts.userDetailsCreated,
@@ -205,18 +198,14 @@ class AdminUsersScreen extends GetView<AdminUserController> {
     // Capture the action type at the time the dialog is shown
     final bool shouldUnblock = user.isBlocked;
     final String userId = user.id;
-    
-    UserActionDialogs.showBlockUnblockDialog(
-      context,
-      user,
-      () {
-        // Use the captured action type instead of checking user.isBlocked again
-        if (shouldUnblock) {
-          controller.unblockUser(userId);
-        } else {
-          controller.blockUser(userId);
-        }
-      },
-    );
+
+    UserActionDialogs.showBlockUnblockDialog(context, user, () {
+      // Use the captured action type instead of checking user.isBlocked again
+      if (shouldUnblock) {
+        controller.unblockUser(userId);
+      } else {
+        controller.blockUser(userId);
+      }
+    });
   }
 }

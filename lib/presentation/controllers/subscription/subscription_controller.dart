@@ -99,9 +99,11 @@ class SubscriptionController extends BaseController {
       final userId = user.id;
       final remaining = await _chatApiService.checkDailyLimit(userId);
       remainingFreeMessages.value = remaining;
-      
+
       if (kDebugMode) {
-        print('📊 SubscriptionController: Updated remaining messages to $remaining');
+        print(
+          '📊 SubscriptionController: Updated remaining messages to $remaining',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
@@ -126,30 +128,38 @@ class SubscriptionController extends BaseController {
           .limit(1)
           .snapshots()
           .listen((snapshot) {
-        if (snapshot.docs.isNotEmpty) {
-          final data = snapshot.docs.first.data() as Map<String, dynamic>;
-          subscription.value = SubscriptionModel.fromJson({
-            'id': snapshot.docs.first.id,
-            ...data,
+            if (snapshot.docs.isNotEmpty) {
+              final data = snapshot.docs.first.data() as Map<String, dynamic>;
+              subscription.value = SubscriptionModel.fromJson({
+                'id': snapshot.docs.first.id,
+                ...data,
+              });
+              isSubscribed.value = subscription.value?.isActive ?? false;
+
+              // Sync user subscription status in local state
+              if (isSubscribed.value) {
+                _syncUserSubscriptionStatus(
+                  true,
+                  AppConstants.subscriptionStatusActive,
+                );
+              } else {
+                // Subscription exists but is not active (cancelled/expired)
+                final status =
+                    subscription.value?.status ??
+                    AppConstants.subscriptionStatusFree;
+                _syncUserSubscriptionStatus(false, status);
+              }
+            } else {
+              subscription.value = null;
+              isSubscribed.value = false;
+
+              // Sync user subscription status in local state
+              _syncUserSubscriptionStatus(
+                false,
+                AppConstants.subscriptionStatusFree,
+              );
+            }
           });
-          isSubscribed.value = subscription.value?.isActive ?? false;
-          
-          // Sync user subscription status in local state
-          if (isSubscribed.value) {
-            _syncUserSubscriptionStatus(true, AppConstants.subscriptionStatusActive);
-          } else {
-            // Subscription exists but is not active (cancelled/expired)
-            final status = subscription.value?.status ?? AppConstants.subscriptionStatusFree;
-            _syncUserSubscriptionStatus(false, status);
-          }
-        } else {
-          subscription.value = null;
-          isSubscribed.value = false;
-          
-          // Sync user subscription status in local state
-          _syncUserSubscriptionStatus(false, AppConstants.subscriptionStatusFree);
-        }
-      });
     } catch (e) {
       if (kDebugMode) {
         print('Error setting up subscription listener: $e');
@@ -198,10 +208,10 @@ class SubscriptionController extends BaseController {
   bool canSendMessage() {
     // Subscribed users always can send
     if (isSubscribed.value) return true;
-    
+
     // Free trial users can send unlimited
     if (isWithinFreeTrial.value) return true;
-    
+
     // After trial, check remaining messages
     return remainingFreeMessages.value > 0;
   }
@@ -210,7 +220,7 @@ class SubscriptionController extends BaseController {
   void decrementFreeMessages() {
     // Don't decrement if subscribed or in free trial
     if (isSubscribed.value || isWithinFreeTrial.value) return;
-    
+
     if (remainingFreeMessages.value > 0) {
       remainingFreeMessages.value--;
     }
@@ -225,7 +235,7 @@ class SubscriptionController extends BaseController {
   }
 
   /// Handle subscription purchase (TEST MODE ONLY)
-  /// 
+  ///
   /// Payment Flow (Updated):
   /// 1. User clicks "Subscribe" → This method is called
   /// 2. Stripe Payment Sheet UI is shown FIRST (built-in from flutter_stripe package)
@@ -235,27 +245,30 @@ class SubscriptionController extends BaseController {
   /// 6. Payment is processed with the clientSecret (TEST MODE - no real charges)
   /// 7. Backend webhook receives payment confirmation and creates subscription
   /// 8. Subscription status is refreshed
-  /// 
+  ///
   /// [planId] - Subscription plan ID (e.g., 'premium_monthly')
-  /// 
+  ///
   /// Returns true if payment was successful, false otherwise
   Future<bool> purchaseSubscription(String planId) async {
     try {
       setLoading(true);
-      
+
       // Get current user
       final user = currentUser;
       final userId = _firebaseService.currentUserId;
-      
+
       if (user == null || userId == null) {
-        showError('Authentication Required', subtitle: 'Please sign in to purchase a subscription.');
+        showError(
+          'Authentication Required',
+          subtitle: 'Please sign in to purchase a subscription.',
+        );
         return false;
       }
-      
+
       // Get subscription price from config
       final amount = AppConfig.monthlySubscriptionPrice;
       const currency = 'usd';
-      
+
       if (kDebugMode) {
         print('💳 Starting subscription purchase (TEST MODE):');
         print('  - Plan ID: $planId');
@@ -263,12 +276,12 @@ class SubscriptionController extends BaseController {
         print('  - User ID: $userId');
         print('  - Mode: TEST MODE (use test card: 4242 4242 4242 4242)');
       }
-      
+
       // IMPORTANT: Stripe Payment Sheet Technical Requirement
-      // 
+      //
       // Stripe Payment Sheet REQUIRES a clientSecret to initialize.
       // The clientSecret comes from creating a payment intent (backend call).
-      // 
+      //
       // However, creating a payment intent does NOT charge the card.
       // The actual charge happens ONLY when the user confirms in the Payment Sheet.
       //
@@ -280,7 +293,7 @@ class SubscriptionController extends BaseController {
       // 5. Payment is processed (CHARGE HAPPENS HERE)
       //
       // This is the secure and standard Stripe flow.
-      
+
       // Step 1: Create payment intent via backend (required to get clientSecret)
       // NOTE: This does NOT charge the card - it just prepares the payment
       // The actual charge happens when user confirms in Step 3
@@ -289,20 +302,20 @@ class SubscriptionController extends BaseController {
         print('  - This prepares the payment but does NOT charge the card');
         print('  - Returns clientSecret needed for Payment Sheet');
       }
-      
+
       String? clientSecret;
       String? publishableKey;
-      
+
       try {
         final paymentData = await _stripeService.createPaymentIntent(
           amount: amount,
           currency: currency,
           userId: userId,
         );
-        
+
         clientSecret = paymentData['clientSecret']!;
         publishableKey = paymentData['publishableKey'];
-        
+
         // Initialize Stripe with publishable key if provided
         // Also get merchant identifier for iOS Apple Pay (optional)
         if (publishableKey != null && publishableKey.isNotEmpty) {
@@ -315,7 +328,9 @@ class SubscriptionController extends BaseController {
             );
           } catch (e) {
             if (kDebugMode) {
-              print('⚠️ Warning: Could not initialize Stripe with provided key: $e');
+              print(
+                '⚠️ Warning: Could not initialize Stripe with provided key: $e',
+              );
               print('  Continuing with existing Stripe configuration...');
             }
           }
@@ -327,7 +342,8 @@ class SubscriptionController extends BaseController {
         }
         showError(
           'Backend Not Available',
-          subtitle: 'Cannot connect to payment server. Please ensure:\n'
+          subtitle:
+              'Cannot connect to payment server. Please ensure:\n'
               '1. Backend server is running\n'
               '2. API_BASE_URL in .env is correct\n'
               '3. Internet connection is active\n\n'
@@ -335,7 +351,7 @@ class SubscriptionController extends BaseController {
         );
         return false;
       }
-      
+
       // Step 2: Show Payment Sheet with clientSecret
       // User enters card details here
       if (kDebugMode) {
@@ -344,7 +360,7 @@ class SubscriptionController extends BaseController {
         print('  - User will enter expiry and CVC');
         print('  - User will tap "Confirm Payment" button');
       }
-      
+
       // Step 3: User confirms payment in the Payment Sheet
       // THIS IS WHERE THE ACTUAL CHARGE HAPPENS
       // The backend webhook will receive the payment confirmation
@@ -353,18 +369,18 @@ class SubscriptionController extends BaseController {
         print('  - When user confirms, payment will be processed');
         print('  - Backend webhook will receive confirmation');
       }
-      
+
       final paymentSuccess = await _stripeService.confirmPayment(
         clientSecret: clientSecret,
       );
-      
+
       if (paymentSuccess) {
         if (kDebugMode) {
           print('✅ Payment successful! (TEST MODE)');
           print('  - Backend webhook will receive confirmation');
           print('  - Creating subscription in Firebase...');
         }
-        
+
         // Step 4: Create/update subscription in Firebase
         await _createOrUpdateSubscription(
           userId: userId,
@@ -372,28 +388,29 @@ class SubscriptionController extends BaseController {
           amount: amount,
           stripeSubscriptionId: null, // Will be set by backend webhook
         );
-        
+
         // Step 5: Update user's subscription status in Firebase
         await _updateUserSubscriptionStatus(
           userId: userId,
           isSubscribed: true,
           subscriptionStatus: AppConstants.subscriptionStatusActive,
         );
-        
+
         // Step 6: Refresh subscription status and user data
         await checkSubscriptionStatus();
         await _refreshUserData();
-        
+
         if (kDebugMode) {
           print('✅ Subscription activated and saved to Firebase');
         }
-        
+
         // Show success message
         showSuccess(
           'Subscription Activated!',
-          subtitle: 'Congratulations! Your subscription is now active. Enjoy unlimited access!',
+          subtitle:
+              'Congratulations! Your subscription is now active. Enjoy unlimited access!',
         );
-        
+
         return true;
       } else {
         if (kDebugMode) {
@@ -401,7 +418,8 @@ class SubscriptionController extends BaseController {
         }
         showError(
           'Payment Cancelled',
-          subtitle: 'The payment was cancelled. Please try again when you\'re ready.',
+          subtitle:
+              'The payment was cancelled. Please try again when you\'re ready.',
         );
         return false;
       }
@@ -410,7 +428,7 @@ class SubscriptionController extends BaseController {
         print('❌ Subscription purchase error: $e');
       }
       setError(e.toString());
-      
+
       // Show user-friendly error message
       final errorMessage = e.toString().replaceAll('Exception: ', '');
       showError(
@@ -427,7 +445,8 @@ class SubscriptionController extends BaseController {
       setError(e.toString());
       showError(
         'Subscription Failed',
-        subtitle: 'An unexpected error occurred. Please try again or contact support.',
+        subtitle:
+            'An unexpected error occurred. Please try again or contact support.',
       );
       return false;
     } finally {
@@ -455,7 +474,11 @@ class SubscriptionController extends BaseController {
           .get();
 
       final now = DateTime.now();
-      final endDate = DateTime(now.year, now.month + 1, now.day); // 1 month from now
+      final endDate = DateTime(
+        now.year,
+        now.month + 1,
+        now.day,
+      ); // 1 month from now
 
       final subscriptionData = {
         'userId': userId,
@@ -474,9 +497,11 @@ class SubscriptionController extends BaseController {
             .collection(AppConstants.collectionSubscriptions)
             .doc(existingSubs.docs.first.id)
             .update(subscriptionData);
-        
+
         if (kDebugMode) {
-          print('✅ Updated existing subscription: ${existingSubs.docs.first.id}');
+          print(
+            '✅ Updated existing subscription: ${existingSubs.docs.first.id}',
+          );
         }
       } else {
         // Create new subscription
@@ -484,7 +509,7 @@ class SubscriptionController extends BaseController {
         await _firebaseService
             .collection(AppConstants.collectionSubscriptions)
             .add(subscriptionData);
-        
+
         if (kDebugMode) {
           print('✅ Created new subscription document');
         }
@@ -566,7 +591,10 @@ class SubscriptionController extends BaseController {
 
       final userId = _firebaseService.currentUserId;
       if (userId == null) {
-        showError('Authentication Required', subtitle: 'Please sign in to manage your subscription.');
+        showError(
+          'Authentication Required',
+          subtitle: 'Please sign in to manage your subscription.',
+        );
         return false;
       }
 
@@ -586,10 +614,10 @@ class SubscriptionController extends BaseController {
             .collection(AppConstants.collectionSubscriptions)
             .doc(existingSubs.docs.first.id)
             .update({
-          'status': AppConstants.subscriptionStatusCancelled,
-          'cancelledAt': DateTime.now(),
-          'updatedAt': DateTime.now(),
-        });
+              'status': AppConstants.subscriptionStatusCancelled,
+              'cancelledAt': DateTime.now(),
+              'updatedAt': DateTime.now(),
+            });
       }
 
       // Update user's subscription status
@@ -609,7 +637,8 @@ class SubscriptionController extends BaseController {
 
       showSuccess(
         'Subscription Cancelled',
-        subtitle: 'Your subscription has been cancelled. You can resubscribe anytime.',
+        subtitle:
+            'Your subscription has been cancelled. You can resubscribe anytime.',
       );
 
       return true;
@@ -619,7 +648,8 @@ class SubscriptionController extends BaseController {
       }
       showError(
         'Cancellation Failed',
-        subtitle: 'We couldn\'t cancel your subscription. Please try again or contact support.',
+        subtitle:
+            'We couldn\'t cancel your subscription. Please try again or contact support.',
       );
       return false;
     } finally {
@@ -628,7 +658,10 @@ class SubscriptionController extends BaseController {
   }
 
   /// Sync user subscription status in local state (without Firebase update)
-  void _syncUserSubscriptionStatus(bool isSubscribed, String subscriptionStatus) {
+  void _syncUserSubscriptionStatus(
+    bool isSubscribed,
+    String subscriptionStatus,
+  ) {
     try {
       if (Get.isRegistered<AuthController>()) {
         final authController = Get.find<AuthController>();
@@ -648,4 +681,3 @@ class SubscriptionController extends BaseController {
     }
   }
 }
-

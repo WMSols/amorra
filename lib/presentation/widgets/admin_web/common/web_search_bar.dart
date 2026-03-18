@@ -64,4 +64,3 @@ class WebSearchBar extends StatelessWidget {
     );
   }
 }
-

@@ -54,4 +54,3 @@ class FirebaseService {
     return _firestore.doc(path);
   }
 }
-

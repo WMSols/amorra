@@ -34,6 +34,7 @@ class SubscriptionActionsMenu extends StatelessWidget {
       ),
       itemBuilder: (context) => [
         PopupMenuItem(
+          onTap: onViewDetails,
           child: Row(
             children: [
               Icon(
@@ -45,10 +46,10 @@ class SubscriptionActionsMenu extends StatelessWidget {
               Text(WebTexts.subscriptionsViewDetails),
             ],
           ),
-          onTap: onViewDetails,
         ),
         if (subscription.status == AppConstants.subscriptionStatusActive)
           PopupMenuItem(
+            onTap: onCancel,
             child: Row(
               children: [
                 Icon(
@@ -59,16 +60,16 @@ class SubscriptionActionsMenu extends StatelessWidget {
                 WebSpacing.horizontalSpacing(context, 0.5),
                 Text(
                   WebTexts.subscriptionsCancel,
-                  style: WebTextStyles.bodyText(context).copyWith(
-                    color: AppColors.error,
-                  ),
+                  style: WebTextStyles.bodyText(
+                    context,
+                  ).copyWith(color: AppColors.error),
                 ),
               ],
             ),
-            onTap: onCancel,
           ),
         if (subscription.status == AppConstants.subscriptionStatusCancelled)
           PopupMenuItem(
+            onTap: onReactivate,
             child: Row(
               children: [
                 Icon(
@@ -79,16 +80,14 @@ class SubscriptionActionsMenu extends StatelessWidget {
                 WebSpacing.horizontalSpacing(context, 0.5),
                 Text(
                   WebTexts.subscriptionsReactivate,
-                  style: WebTextStyles.bodyText(context).copyWith(
-                    color: AppColors.success,
-                  ),
+                  style: WebTextStyles.bodyText(
+                    context,
+                  ).copyWith(color: AppColors.success),
                 ),
               ],
             ),
-            onTap: onReactivate,
           ),
       ],
     );
   }
 }
-

@@ -10,12 +10,11 @@ class ChatBinding extends Bindings {
   void dependencies() {
     // Register repositories
     Get.lazyPut(() => ChatRepository());
-    
+
     // Register services
     Get.lazyPut(() => ChatService());
-    
+
     // Register controllers
     Get.lazyPut(() => ChatController());
   }
 }
-

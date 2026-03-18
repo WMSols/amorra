@@ -80,4 +80,3 @@ class ProfileNameEditField extends StatelessWidget {
     );
   }
 }
-

@@ -52,12 +52,13 @@ class AppCheckbox extends StatelessWidget {
           if (label != null || customLabel != null) ...[
             AppSpacing.horizontal(context, 0.02),
             Expanded(
-              child: customLabel ??
+              child:
+                  customLabel ??
                   Text(
                     label!,
-                    style: AppTextStyles.bodyText(context).copyWith(
-                      color: AppColors.black,
-                    ),
+                    style: AppTextStyles.bodyText(
+                      context,
+                    ).copyWith(color: AppColors.black),
                   ),
             ),
           ],
@@ -66,4 +67,3 @@ class AppCheckbox extends StatelessWidget {
     );
   }
 }
-

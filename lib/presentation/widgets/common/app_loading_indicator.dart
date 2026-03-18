@@ -10,11 +10,7 @@ class AppLoadingIndicator extends StatelessWidget {
   final Color? color;
   final double? size;
 
-  const AppLoadingIndicator({
-    super.key,
-    this.color,
-    this.size,
-  });
+  const AppLoadingIndicator({super.key, this.color, this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +24,7 @@ class AppLoadingIndicator extends StatelessWidget {
 
     return SizedBox(
       width: indicatorSize,
-      child: Lottie.asset(
-        lottiePath,
-        fit: BoxFit.contain,
-        repeat: true,
-      ),
+      child: Lottie.asset(lottiePath, fit: BoxFit.contain, repeat: true),
     );
   }
 }
-

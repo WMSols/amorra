@@ -34,10 +34,7 @@ class AuthController extends BaseController {
   }
 
   /// Sign in with email and password
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> signIn({required String email, required String password}) async {
     try {
       setLoading(true);
       clearError();
@@ -49,7 +46,10 @@ class AuthController extends BaseController {
 
       currentUser.value = user;
       isAuthenticated.value = true;
-      showSuccess('Welcome back!', subtitle: 'Great to see you again. Let\'s continue where you left off!');
+      showSuccess(
+        'Welcome back!',
+        subtitle: 'Great to see you again. Let\'s continue where you left off!',
+      );
 
       return true;
     } catch (e) {
@@ -80,7 +80,11 @@ class AuthController extends BaseController {
 
       currentUser.value = user;
       isAuthenticated.value = true;
-      showSuccess('Account Created!', subtitle: 'Welcome to Amorra! Your account has been created successfully.');
+      showSuccess(
+        'Account Created!',
+        subtitle:
+            'Welcome to Amorra! Your account has been created successfully.',
+      );
 
       return true;
     } catch (e) {
@@ -100,7 +104,10 @@ class AuthController extends BaseController {
       await _authRepository.signOut();
       currentUser.value = null;
       isAuthenticated.value = false;
-      showSuccess('Signed Out', subtitle: 'You\'ve been successfully signed out. See you soon!');
+      showSuccess(
+        'Signed Out',
+        subtitle: 'You\'ve been successfully signed out. See you soon!',
+      );
     } catch (e) {
       setError(e.toString());
       final errorInfo = FirebaseErrorHandler.parseError(e);
@@ -126,4 +133,3 @@ class AuthController extends BaseController {
     }
   }
 }
-

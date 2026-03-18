@@ -10,10 +10,7 @@ import 'package:amorra/core/utils/app_styles/app_text_styles.dart';
 class AppTextFieldErrorMessage extends StatelessWidget {
   final String errorText;
 
-  const AppTextFieldErrorMessage({
-    super.key,
-    required this.errorText,
-  });
+  const AppTextFieldErrorMessage({super.key, required this.errorText});
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +27,7 @@ class AppTextFieldErrorMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(
-              top: AppResponsive.scaleSize(context, 2),
-            ),
+            padding: EdgeInsets.only(top: AppResponsive.scaleSize(context, 2)),
             child: Icon(
               Iconsax.info_circle,
               size: AppResponsive.scaleSize(context, 14),
@@ -55,4 +50,3 @@ class AppTextFieldErrorMessage extends StatelessWidget {
     );
   }
 }
-

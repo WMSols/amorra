@@ -16,7 +16,7 @@ class ChatRepository {
         print('📡 Setting up Firestore stream for userId: $userId');
         print('📡 Reading from: messages/$userId/history');
       }
-      
+
       return _firebaseService
           .collection(AppConstants.collectionMessages)
           .doc(userId)
@@ -27,29 +27,21 @@ class ChatRepository {
             if (kDebugMode) {
               print('📡 Stream snapshot: ${snapshot.docs.length} documents');
             }
-            
-            return snapshot.docs
-                .map(
-                  (doc) {
-                    try {
-                      final data = doc.data() as Map<String, dynamic>? ?? {};
-                      if (kDebugMode && data.isEmpty) {
-                        print('⚠️ Stream document ${doc.id} has empty data');
-                      }
-                      return ChatMessageModel.fromJson({
-                        'id': doc.id,
-                        ...data,
-                      });
-                    } catch (e) {
-                      if (kDebugMode) {
-                        print('❌ Error parsing stream document ${doc.id}: $e');
-                      }
-                      rethrow;
-                    }
-                  },
-                )
-                .toList()
-              ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+            return snapshot.docs.map((doc) {
+              try {
+                final data = doc.data() as Map<String, dynamic>? ?? {};
+                if (kDebugMode && data.isEmpty) {
+                  print('⚠️ Stream document ${doc.id} has empty data');
+                }
+                return ChatMessageModel.fromJson({'id': doc.id, ...data});
+              } catch (e) {
+                if (kDebugMode) {
+                  print('❌ Error parsing stream document ${doc.id}: $e');
+                }
+                rethrow;
+              }
+            }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
           });
     } catch (e) {
       if (kDebugMode) {
@@ -87,7 +79,7 @@ class ChatRepository {
         print('🔍 Querying Firestore for messages with userId: $userId');
         print('🔍 Reading from: messages/$userId/history');
       }
-      
+
       final snapshot = await _firebaseService
           .collection(AppConstants.collectionMessages)
           .doc(userId)
@@ -106,38 +98,32 @@ class ChatRepository {
         }
       }
 
-      final messages = snapshot.docs
-          .map(
-            (doc) {
-              try {
-                final data = doc.data() as Map<String, dynamic>? ?? {};
-                if (kDebugMode && data.isEmpty) {
-                  print('⚠️ Document ${doc.id} has empty data');
-                }
-                final message = ChatMessageModel.fromJson({
-                  'id': doc.id,
-                  ...data,
-                });
-                if (kDebugMode) {
-                  print('  ✓ Parsed message: ${message.type} - ${message.message.substring(0, message.message.length > 20 ? 20 : message.message.length)}...');
-                }
-                return message;
-              } catch (e) {
-                if (kDebugMode) {
-                  print('❌ Error parsing document ${doc.id}: $e');
-                  print('  Document data: ${doc.data()}');
-                }
-                rethrow;
-              }
-            },
-          )
-          .toList()
-        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-      
+      final messages = snapshot.docs.map((doc) {
+        try {
+          final data = doc.data() as Map<String, dynamic>? ?? {};
+          if (kDebugMode && data.isEmpty) {
+            print('⚠️ Document ${doc.id} has empty data');
+          }
+          final message = ChatMessageModel.fromJson({'id': doc.id, ...data});
+          if (kDebugMode) {
+            print(
+              '  ✓ Parsed message: ${message.type} - ${message.message.substring(0, message.message.length > 20 ? 20 : message.message.length)}...',
+            );
+          }
+          return message;
+        } catch (e) {
+          if (kDebugMode) {
+            print('❌ Error parsing document ${doc.id}: $e');
+            print('  Document data: ${doc.data()}');
+          }
+          rethrow;
+        }
+      }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
       if (kDebugMode) {
         print('✅ Successfully parsed ${messages.length} messages');
       }
-      
+
       return messages;
     } catch (e) {
       if (kDebugMode) {
@@ -164,16 +150,18 @@ class ChatRepository {
       try {
         final historyRef = messagesDocRef.collection('history');
         final historySnapshot = await historyRef.get();
-        
+
         if (historySnapshot.docs.isNotEmpty) {
           final batch = _firebaseService.firestore.batch();
           for (final doc in historySnapshot.docs) {
             batch.delete(doc.reference);
           }
           await batch.commit();
-          
+
           if (kDebugMode) {
-            print('✅ Deleted ${historySnapshot.docs.length} messages from history subcollection');
+            print(
+              '✅ Deleted ${historySnapshot.docs.length} messages from history subcollection',
+            );
           }
         }
       } catch (e) {
@@ -187,16 +175,18 @@ class ChatRepository {
       try {
         final chatsRef = messagesDocRef.collection('chats');
         final chatsSnapshot = await chatsRef.get();
-        
+
         if (chatsSnapshot.docs.isNotEmpty) {
           final batch = _firebaseService.firestore.batch();
           for (final doc in chatsSnapshot.docs) {
             batch.delete(doc.reference);
           }
           await batch.commit();
-          
+
           if (kDebugMode) {
-            print('✅ Deleted ${chatsSnapshot.docs.length} messages from chats subcollection');
+            print(
+              '✅ Deleted ${chatsSnapshot.docs.length} messages from chats subcollection',
+            );
           }
         }
       } catch (e) {
@@ -267,10 +257,7 @@ class ChatRepository {
       if (snapshot.docs.isEmpty) return null;
 
       final data = snapshot.docs.first.data() as Map<String, dynamic>? ?? {};
-      return ChatMessageModel.fromJson({
-        'id': snapshot.docs.first.id,
-        ...data,
-      });
+      return ChatMessageModel.fromJson({'id': snapshot.docs.first.id, ...data});
     } catch (e) {
       if (kDebugMode) {
         print('Get last message error: $e');

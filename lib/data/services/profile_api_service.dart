@@ -1,6 +1,7 @@
 /// Profile API Service
 /// Placeholder service for profile-related API calls
 /// TODO: Replace all methods with actual API endpoints when backend is ready
+library;
 
 class ProfileApiService {
   /// Save user preferences
@@ -26,10 +27,7 @@ class ProfileApiService {
 
     // Placeholder return
     await Future.delayed(const Duration(milliseconds: 500));
-    return {
-      'success': true,
-      'message': 'Preferences saved successfully',
-    };
+    return {'success': true, 'message': 'Preferences saved successfully'};
   }
 
   /// Get user preferences
@@ -50,4 +48,3 @@ class ProfileApiService {
     return null; // No existing preferences
   }
 }
-

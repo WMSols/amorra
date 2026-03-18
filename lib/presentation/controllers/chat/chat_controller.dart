@@ -27,29 +27,31 @@ class ChatController extends BaseController {
   // State
   final RxList<ChatMessageModel> messages = <ChatMessageModel>[].obs;
   final RxBool isTyping = false.obs;
-  final RxInt remainingMessages = 999.obs; // Default to unlimited (will be updated based on trial/subscription)
+  final RxInt remainingMessages = 999
+      .obs; // Default to unlimited (will be updated based on trial/subscription)
   final RxBool isWithinFreeTrial = false.obs;
   final TextEditingController inputController = TextEditingController();
-  final Rx<DateTime> visibleDate = DateTime.now().obs; // Date of message currently visible at top
+  final Rx<DateTime> visibleDate =
+      DateTime.now().obs; // Date of message currently visible at top
 
   // Stream subscription for messages
   StreamSubscription<List<ChatMessageModel>>? _messagesSubscription;
-  
+
   // Pending starter message to send when chat screen becomes active
   String? _pendingStarterMessage;
-  
+
   // Track all processed message IDs to prevent duplicates (stable approach)
   final Set<String> _processedMessageIds = <String>{};
-  
+
   // Track pending API requests to prevent duplicate messages
   final Set<String> _pendingMessageTexts = <String>{};
-  
+
   // Current API request (for cancellation)
   Future<void>? _currentApiRequest;
 
   // Scroll controller for messages list (managed by controller for better control)
   final ScrollController scrollController = ScrollController();
-  
+
   // Map temp message IDs to their content for easy removal when Firestore confirms
   // Key: temp message ID, Value: message content
   final Map<String, String> _tempMessageContent = {};
@@ -61,10 +63,10 @@ class ChatController extends BaseController {
     if (user != null && user.isSubscribed) {
       return true; // Subscribed users have unlimited messages
     }
-    
+
     // If within free trial, always allow
     if (isWithinFreeTrial.value) return true;
-    
+
     // After trial, check remaining messages
     return remainingMessages.value > 0;
   }
@@ -120,10 +122,10 @@ class ChatController extends BaseController {
   @override
   void onInit() {
     super.onInit();
-    
+
     // Initialize scroll controller listener
     _setupScrollController();
-    
+
     // Initialize if user is already available
     if (userId != null) {
       _initializeChat();
@@ -154,8 +156,9 @@ class ChatController extends BaseController {
     // Check if there's a pending starter message to send
     if (_pendingStarterMessage != null && _pendingStarterMessage!.isNotEmpty) {
       final message = _pendingStarterMessage!;
-      _pendingStarterMessage = null; // Clear it first to prevent duplicate sends
-      
+      _pendingStarterMessage =
+          null; // Clear it first to prevent duplicate sends
+
       // Send the starter message after a short delay to ensure screen is ready
       Future.delayed(const Duration(milliseconds: 300), () {
         if (userId != null && message.isNotEmpty) {
@@ -187,14 +190,14 @@ class ChatController extends BaseController {
         });
         return;
       }
-      
+
       final authController = Get.find<AuthController>();
-      
+
       // Listen to currentUser changes reactively
       ever(authController.currentUser, (UserModel? user) {
         handleUserChange(user);
       });
-      
+
       // Immediately check and handle the current user value
       // This ensures we catch the user if they're already logged in
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -211,13 +214,15 @@ class ChatController extends BaseController {
   /// Made public so MainNavigationController can call it
   void handleUserChange(UserModel? user) {
     if (kDebugMode) {
-      print('👤 User changed in ChatController: ${user?.name ?? 'null'} (ID: ${user?.id ?? 'null'})');
+      print(
+        '👤 User changed in ChatController: ${user?.name ?? 'null'} (ID: ${user?.id ?? 'null'})',
+      );
       print('  - isSubscribed: ${user?.isSubscribed ?? false}');
     }
-    
+
     _checkFreeTrialStatus();
     _updateMessageLimitBasedOnSubscription(user);
-    
+
     if (userId != null && user != null) {
       // New user logged in - re-initialize everything
       if (kDebugMode) {
@@ -321,137 +326,158 @@ class ChatController extends BaseController {
       print('👂 Starting Firestore stream listener for userId: $userId');
     }
 
-    _messagesSubscription = _chatService.getMessagesStream(userId!).listen((newMessages) {
-      // Stable approach: Use Firestore as single source of truth
-      // Track message IDs to prevent duplicates
-      if (kDebugMode) {
-        print('📡 Firestore stream update: ${newMessages.length} messages');
-      }
-      
-      // Get current messages
-      final currentMessages = List<ChatMessageModel>.from(messages);
-      final finalMessages = <ChatMessageModel>[];
-      final seenIds = <String>{};
-      
-      // First, add all Firestore messages (source of truth)
-      // Only add if we haven't processed this ID before
-      for (var fsMsg in newMessages) {
-        if (!_processedMessageIds.contains(fsMsg.id)) {
-          // New message from Firestore - add it
-          finalMessages.add(fsMsg);
-          seenIds.add(fsMsg.id);
-          _processedMessageIds.add(fsMsg.id);
-          
-          // Remove any temp message with matching content
-          _tempMessageContent.removeWhere((tempId, content) {
-            if (content == fsMsg.message && fsMsg.type == 'user') {
-              // Remove temp message from current messages
-              currentMessages.removeWhere((msg) => msg.id == tempId);
-              if (kDebugMode) {
-                print('🔄 Removed temp message $tempId (replaced by Firestore ${fsMsg.id})');
+    _messagesSubscription = _chatService
+        .getMessagesStream(userId!)
+        .listen(
+          (newMessages) {
+            // Stable approach: Use Firestore as single source of truth
+            // Track message IDs to prevent duplicates
+            if (kDebugMode) {
+              print(
+                '📡 Firestore stream update: ${newMessages.length} messages',
+              );
+            }
+
+            // Get current messages
+            final currentMessages = List<ChatMessageModel>.from(messages);
+            final finalMessages = <ChatMessageModel>[];
+            final seenIds = <String>{};
+
+            // First, add all Firestore messages (source of truth)
+            // Only add if we haven't processed this ID before
+            for (var fsMsg in newMessages) {
+              if (!_processedMessageIds.contains(fsMsg.id)) {
+                // New message from Firestore - add it
+                finalMessages.add(fsMsg);
+                seenIds.add(fsMsg.id);
+                _processedMessageIds.add(fsMsg.id);
+
+                // Remove any temp message with matching content
+                _tempMessageContent.removeWhere((tempId, content) {
+                  if (content == fsMsg.message && fsMsg.type == 'user') {
+                    // Remove temp message from current messages
+                    currentMessages.removeWhere((msg) => msg.id == tempId);
+                    if (kDebugMode) {
+                      print(
+                        '🔄 Removed temp message $tempId (replaced by Firestore ${fsMsg.id})',
+                      );
+                    }
+                    return true;
+                  }
+                  return false;
+                });
+              } else {
+                // Already processed this ID - skip to prevent duplicates
+                if (kDebugMode) {
+                  print('⏭️ Skipping already processed message: ${fsMsg.id}');
+                }
               }
-              return true;
             }
-            return false;
-          });
-        } else {
-          // Already processed this ID - skip to prevent duplicates
-          if (kDebugMode) {
-            print('⏭️ Skipping already processed message: ${fsMsg.id}');
-          }
-        }
-      }
-      
-      // Add temp messages that haven't been confirmed by Firestore yet
-      // Only keep recent temp messages (within 30 seconds)
-      final now = DateTime.now();
-      for (var msg in currentMessages) {
-        if (msg.id.startsWith('temp_')) {
-          final isRecent = now.difference(msg.timestamp).inSeconds < 30;
-          final notInFirestore = !seenIds.contains(msg.id);
-          
-          // Check if Firestore has a message with same content
-          final hasMatchingInFirestore = newMessages.any((fsMsg) =>
-            fsMsg.message == msg.message &&
-            fsMsg.type == msg.type &&
-            (fsMsg.timestamp.difference(msg.timestamp).inSeconds.abs() <= 5)
-          );
-          
-          if (isRecent && notInFirestore && !hasMatchingInFirestore) {
-            // Keep temp message - not yet in Firestore
-            finalMessages.add(msg);
+
+            // Add temp messages that haven't been confirmed by Firestore yet
+            // Only keep recent temp messages (within 30 seconds)
+            final now = DateTime.now();
+            for (var msg in currentMessages) {
+              if (msg.id.startsWith('temp_')) {
+                final isRecent = now.difference(msg.timestamp).inSeconds < 30;
+                final notInFirestore = !seenIds.contains(msg.id);
+
+                // Check if Firestore has a message with same content
+                final hasMatchingInFirestore = newMessages.any(
+                  (fsMsg) =>
+                      fsMsg.message == msg.message &&
+                      fsMsg.type == msg.type &&
+                      (fsMsg.timestamp
+                              .difference(msg.timestamp)
+                              .inSeconds
+                              .abs() <=
+                          5),
+                );
+
+                if (isRecent && notInFirestore && !hasMatchingInFirestore) {
+                  // Keep temp message - not yet in Firestore
+                  finalMessages.add(msg);
+                  if (kDebugMode) {
+                    print('⏳ Keeping temp message: ${msg.id}');
+                  }
+                } else if (hasMatchingInFirestore) {
+                  // Firestore has this message - don't add temp version
+                  if (kDebugMode) {
+                    print(
+                      '✅ Skipping temp message (Firestore confirmed): ${msg.id}',
+                    );
+                  }
+                }
+              } else if (!seenIds.contains(msg.id)) {
+                // Non-temp message that's not in Firestore stream - keep it
+                // This handles edge cases where messages might be in local state but not in stream
+                finalMessages.add(msg);
+                seenIds.add(msg.id);
+              }
+            }
+
+            // Final deduplication by ID (safety check)
+            final uniqueMessages = <String, ChatMessageModel>{};
+            for (var msg in finalMessages) {
+              if (!uniqueMessages.containsKey(msg.id)) {
+                uniqueMessages[msg.id] = msg;
+              } else {
+                // Duplicate ID found - prefer non-temp version
+                final existing = uniqueMessages[msg.id]!;
+                if (msg.id.startsWith('temp_') &&
+                    !existing.id.startsWith('temp_')) {
+                  // Keep existing (non-temp)
+                } else if (!msg.id.startsWith('temp_') &&
+                    existing.id.startsWith('temp_')) {
+                  // Replace with non-temp
+                  uniqueMessages[msg.id] = msg;
+                }
+              }
+            }
+
+            // Convert to list and sort by timestamp
+            final sortedMessages = uniqueMessages.values.toList()
+              ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
             if (kDebugMode) {
-              print('⏳ Keeping temp message: ${msg.id}');
+              print(
+                '  - Final: ${sortedMessages.length} messages (${newMessages.length} from Firestore)',
+              );
+              print('  - Processed IDs: ${_processedMessageIds.length}');
+              print('  - Temp messages: ${_tempMessageContent.length}');
             }
-          } else if (hasMatchingInFirestore) {
-            // Firestore has this message - don't add temp version
-            if (kDebugMode) {
-              print('✅ Skipping temp message (Firestore confirmed): ${msg.id}');
+
+            // Update messages list
+            messages.value = sortedMessages;
+
+            // Update visible date if we have messages
+            if (sortedMessages.isNotEmpty) {
+              final lastMessage = sortedMessages.last;
+              visibleDate.value = DateTime(
+                lastMessage.timestamp.year,
+                lastMessage.timestamp.month,
+                lastMessage.timestamp.day,
+              );
             }
-          }
-        } else if (!seenIds.contains(msg.id)) {
-          // Non-temp message that's not in Firestore stream - keep it
-          // This handles edge cases where messages might be in local state but not in stream
-          finalMessages.add(msg);
-          seenIds.add(msg.id);
-        }
-      }
-      
-      // Final deduplication by ID (safety check)
-      final uniqueMessages = <String, ChatMessageModel>{};
-      for (var msg in finalMessages) {
-        if (!uniqueMessages.containsKey(msg.id)) {
-          uniqueMessages[msg.id] = msg;
-        } else {
-          // Duplicate ID found - prefer non-temp version
-          final existing = uniqueMessages[msg.id]!;
-          if (msg.id.startsWith('temp_') && !existing.id.startsWith('temp_')) {
-            // Keep existing (non-temp)
-          } else if (!msg.id.startsWith('temp_') && existing.id.startsWith('temp_')) {
-            // Replace with non-temp
-            uniqueMessages[msg.id] = msg;
-          }
-        }
-      }
-      
-      // Convert to list and sort by timestamp
-      final sortedMessages = uniqueMessages.values.toList()
-        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-      
-      if (kDebugMode) {
-        print('  - Final: ${sortedMessages.length} messages (${newMessages.length} from Firestore)');
-        print('  - Processed IDs: ${_processedMessageIds.length}');
-        print('  - Temp messages: ${_tempMessageContent.length}');
-      }
-      
-      // Update messages list
-      messages.value = sortedMessages;
-      
-      // Update visible date if we have messages
-      if (sortedMessages.isNotEmpty) {
-        final lastMessage = sortedMessages.last;
-        visibleDate.value = DateTime(
-          lastMessage.timestamp.year,
-          lastMessage.timestamp.month,
-          lastMessage.timestamp.day,
+          },
+          onError: (error) {
+            // Only log error if user is still authenticated
+            // Permission errors are expected when user logs out
+            if (userId != null) {
+              if (kDebugMode) {
+                print('❌ Firestore stream error: $error');
+                print('Stack trace: ${StackTrace.current}');
+              }
+              setError('Failed to load messages: ${error.toString()}');
+            } else {
+              // User logged out, silently ignore permission errors
+              if (kDebugMode) {
+                print('ℹ️ Stream error after logout (expected): $error');
+              }
+            }
+          },
+          cancelOnError: false,
         );
-      }
-    }, onError: (error) {
-      // Only log error if user is still authenticated
-      // Permission errors are expected when user logs out
-      if (userId != null) {
-        if (kDebugMode) {
-          print('❌ Firestore stream error: $error');
-          print('Stack trace: ${StackTrace.current}');
-        }
-        setError('Failed to load messages: ${error.toString()}');
-      } else {
-        // User logged out, silently ignore permission errors
-        if (kDebugMode) {
-          print('ℹ️ Stream error after logout (expected): $error');
-        }
-      }
-    }, cancelOnError: false);
   }
 
   /// Load initial messages
@@ -472,13 +498,13 @@ class ChatController extends BaseController {
         userId!,
         AppConfig.maxContextMessages * 2,
       );
-      
+
       if (kDebugMode) {
         print('✅ Loaded ${recentMessages.length} messages from Firestore');
       }
-      
+
       messages.value = recentMessages;
-      
+
       // Initialize visible date with the most recent message or current date
       if (recentMessages.isNotEmpty) {
         final lastMessage = recentMessages.last;
@@ -487,9 +513,11 @@ class ChatController extends BaseController {
           lastMessage.timestamp.month,
           lastMessage.timestamp.day,
         );
-        
+
         if (kDebugMode) {
-          print('✅ Loaded ${recentMessages.length} messages. Last message: ${lastMessage.type}');
+          print(
+            '✅ Loaded ${recentMessages.length} messages. Last message: ${lastMessage.type}',
+          );
         }
       } else {
         visibleDate.value = DateTime.now();
@@ -514,10 +542,10 @@ class ChatController extends BaseController {
     if (kDebugMode) {
       print('📝 Sending starter message: $message');
     }
-    
+
     // Set the message in the input field
     inputController.text = message;
-    
+
     // Send the message
     await sendMessage();
   }
@@ -529,12 +557,12 @@ class ChatController extends BaseController {
       _pendingStarterMessage = null;
       return;
     }
-    
+
     _pendingStarterMessage = message;
     if (kDebugMode) {
       print('📝 Pending starter message set: $message');
     }
-    
+
     // If user is available and controller is ready, send immediately
     // Otherwise, onReady will handle it
     if (userId != null) {
@@ -552,7 +580,10 @@ class ChatController extends BaseController {
   /// Send message
   Future<void> sendMessage() async {
     if (userId == null) {
-      showError('Sign In Required', subtitle: 'Please sign in to start chatting and send messages.');
+      showError(
+        'Sign In Required',
+        subtitle: 'Please sign in to start chatting and send messages.',
+      );
       return;
     }
 
@@ -566,7 +597,8 @@ class ChatController extends BaseController {
     if (user != null && user.isBlocked) {
       showError(
         'Account Blocked',
-        subtitle: 'Your account has been blocked. Please contact support if you believe this is an error.',
+        subtitle:
+            'Your account has been blocked. Please contact support if you believe this is an error.',
       );
       return;
     }
@@ -577,33 +609,36 @@ class ChatController extends BaseController {
     // Check free trial status
     final isInTrial = user != null && FreeTrialUtils.isWithinFreeTrial(user);
     final hasUnlimited = isSubscribed || isInTrial;
-    
+
     if (!hasUnlimited && remainingMessages.value <= 0) {
       showError(
         'Daily Limit Reached',
-        subtitle: 'You\'ve reached your daily message limit. Upgrade to Premium for unlimited messages.',
+        subtitle:
+            'You\'ve reached your daily message limit. Upgrade to Premium for unlimited messages.',
       );
       return;
     }
 
     // Store message text before clearing input
     final messageText = message;
-    
+
     // Check if this exact message is already being processed (prevent duplicates)
     if (_pendingMessageTexts.contains(messageText)) {
       if (kDebugMode) {
-        print('⚠️ Message already being processed, ignoring duplicate: $messageText');
+        print(
+          '⚠️ Message already being processed, ignoring duplicate: $messageText',
+        );
       }
       return;
     }
-    
+
     // Store temp message ID for error handling
     String? tempUserMessageId;
 
     try {
       // Mark message as pending
       _pendingMessageTexts.add(messageText);
-      
+
       // Clear input immediately for better UX
       inputController.clear();
 
@@ -617,14 +652,15 @@ class ChatController extends BaseController {
         type: 'user', // Use string directly instead of AppConstants
         timestamp: userMessageTimestamp,
       );
-      
+
       // Check if we already have this exact message (prevent duplicates)
-      final hasDuplicate = messages.any((msg) => 
-        msg.message == messageText && 
-        msg.type == 'user' &&
-        (DateTime.now().difference(msg.timestamp).inSeconds < 5)
+      final hasDuplicate = messages.any(
+        (msg) =>
+            msg.message == messageText &&
+            msg.type == 'user' &&
+            (DateTime.now().difference(msg.timestamp).inSeconds < 5),
       );
-      
+
       if (hasDuplicate) {
         if (kDebugMode) {
           print('⚠️ Duplicate user message detected, skipping: $messageText');
@@ -632,10 +668,10 @@ class ChatController extends BaseController {
         _pendingMessageTexts.remove(messageText);
         return;
       }
-      
+
       // Track temp message content for later removal when Firestore confirms
       _tempMessageContent[tempUserMessageId] = messageText;
-      
+
       // Add user message to the list immediately
       final updatedMessages = List<ChatMessageModel>.from(messages);
       updatedMessages.add(userMessage);
@@ -662,15 +698,16 @@ class ChatController extends BaseController {
       final isSubscribed = user?.isSubscribed ?? false;
       final isInTrial = user != null && FreeTrialUtils.isWithinFreeTrial(user);
       final hasUnlimited = isSubscribed || isInTrial;
-      
+
       if (!hasUnlimited) {
         remainingMessages.value = (remainingMessages.value - 1).clamp(0, 999);
-        
+
         // Also update SubscriptionController to keep ProfileScreen in sync
         try {
           if (Get.isRegistered<SubscriptionController>()) {
             final subscriptionController = Get.find<SubscriptionController>();
-            subscriptionController.remainingFreeMessages.value = remainingMessages.value;
+            subscriptionController.remainingFreeMessages.value =
+                remainingMessages.value;
           }
         } catch (e) {
           if (kDebugMode) {
@@ -683,38 +720,44 @@ class ChatController extends BaseController {
         print('Error sending message: $e');
       }
       setError(e.toString());
-      
+
       // Remove temp user message on error (if it was added)
       final updatedMessages = List<ChatMessageModel>.from(messages);
-      updatedMessages.removeWhere((msg) => 
-        msg.id == tempUserMessageId || 
-        (msg.id.startsWith('temp_') && msg.type == 'user' && msg.message == messageText)
+      updatedMessages.removeWhere(
+        (msg) =>
+            msg.id == tempUserMessageId ||
+            (msg.id.startsWith('temp_') &&
+                msg.type == 'user' &&
+                msg.message == messageText),
       );
       messages.value = updatedMessages;
-      
+
       // Restore message in input field on error
       inputController.text = messageText;
-      
+
       // Show user-friendly error message
       final errorMessage = e.toString().replaceAll('Exception: ', '');
       showError(
-        'Message Failed', 
-        subtitle: errorMessage.isNotEmpty 
-            ? errorMessage 
+        'Message Failed',
+        subtitle: errorMessage.isNotEmpty
+            ? errorMessage
             : 'We couldn\'t send your message. Please check your connection and try again.',
       );
     } finally {
       // Always remove from pending set and clear request
       _pendingMessageTexts.remove(messageText);
       _currentApiRequest = null;
-      
+
       // Hide typing indicator
       isTyping.value = false;
     }
   }
 
   /// Send message using API and update UI directly from response
-  Future<void> _sendMessageWithAPI(String message, String originalMessageText) async {
+  Future<void> _sendMessageWithAPI(
+    String message,
+    String originalMessageText,
+  ) async {
     if (userId == null) return;
 
     // Call backend API
@@ -730,37 +773,41 @@ class ChatController extends BaseController {
     // Also supports legacy formats for backward compatibility
     String aiResponseText = '';
     String? threadId;
-    
+
     if (kDebugMode) {
       print('🔍 Parsing API response...');
       print('  - response[\'message\']: ${response['message']}');
       print('  - response[\'thread_id\']: ${response['thread_id']}');
       print('  - response[\'data\']: ${response['data']}');
     }
-    
+
     // New API format: direct message field
     if (response['message'] != null) {
       aiResponseText = response['message'].toString();
       threadId = response['thread_id']?.toString();
       if (kDebugMode) {
-        print('✅ Found message in response[\'message\']: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...');
+        print(
+          '✅ Found message in response[\'message\']: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...',
+        );
         if (threadId != null) {
           print('✅ Thread ID: $threadId');
         }
       }
     }
-    
+
     // Fallback: Try data.message field (legacy format)
     if (aiResponseText.isEmpty && response['data'] != null) {
       final data = response['data'] as Map<String, dynamic>?;
       if (data != null && data['message'] != null) {
         aiResponseText = data['message'].toString();
         if (kDebugMode) {
-          print('✅ Found message in response[\'data\'][\'message\']: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...');
+          print(
+            '✅ Found message in response[\'data\'][\'message\']: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...',
+          );
         }
       }
     }
-    
+
     // Fallback: Try extracting from history array (legacy format)
     if (aiResponseText.isEmpty && response['data'] != null) {
       final data = response['data'] as Map<String, dynamic>?;
@@ -770,10 +817,14 @@ class ChatController extends BaseController {
           // Find the last assistant message in the history
           for (int i = history.length - 1; i >= 0; i--) {
             final msg = history[i] as Map<String, dynamic>?;
-            if (msg != null && msg['role'] == 'assistant' && msg['content'] != null) {
+            if (msg != null &&
+                msg['role'] == 'assistant' &&
+                msg['content'] != null) {
               aiResponseText = msg['content'].toString();
               if (kDebugMode) {
-                print('✅ Found message in history: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...');
+                print(
+                  '✅ Found message in history: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...',
+                );
               }
               break;
             }
@@ -781,15 +832,17 @@ class ChatController extends BaseController {
         }
       }
     }
-    
+
     if (kDebugMode) {
       print('✅ API Response received:');
-      print('  - AI Message: ${aiResponseText.isNotEmpty ? aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length) : "EMPTY"}...');
+      print(
+        '  - AI Message: ${aiResponseText.isNotEmpty ? aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length) : "EMPTY"}...',
+      );
       if (threadId != null) {
         print('  - Thread ID: $threadId');
       }
     }
-    
+
     if (aiResponseText.isEmpty) {
       if (kDebugMode) {
         print('⚠️ Warning: AI response text is empty!');
@@ -797,11 +850,11 @@ class ChatController extends BaseController {
       }
       throw Exception('AI response is empty');
     }
-    
+
     // Extract message IDs from API response (if available)
     final userMessageId = response['user_message_id']?.toString();
     final aiMessageId = response['ai_message_id']?.toString();
-    
+
     // Track these IDs as processed to prevent duplicates when Firestore stream updates
     if (userMessageId != null) {
       _processedMessageIds.add(userMessageId);
@@ -809,7 +862,9 @@ class ChatController extends BaseController {
       _tempMessageContent.removeWhere((tempId, content) {
         if (content == originalMessageText) {
           if (kDebugMode) {
-            print('🔄 Removing temp message $tempId (got real ID: $userMessageId)');
+            print(
+              '🔄 Removing temp message $tempId (got real ID: $userMessageId)',
+            );
           }
           return true;
         }
@@ -819,26 +874,30 @@ class ChatController extends BaseController {
     if (aiMessageId != null) {
       _processedMessageIds.add(aiMessageId);
     }
-    
+
     // Check if we already have this AI response (prevent duplicates from retries)
-    final hasDuplicateAi = messages.any((msg) => 
-      msg.message == aiResponseText && 
-      msg.type == 'ai' &&
-      (DateTime.now().difference(msg.timestamp).inSeconds < 10)
+    final hasDuplicateAi = messages.any(
+      (msg) =>
+          msg.message == aiResponseText &&
+          msg.type == 'ai' &&
+          (DateTime.now().difference(msg.timestamp).inSeconds < 10),
     );
-    
+
     if (hasDuplicateAi) {
       if (kDebugMode) {
-        print('⚠️ Duplicate AI message detected, skipping: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...');
+        print(
+          '⚠️ Duplicate AI message detected, skipping: ${aiResponseText.substring(0, aiResponseText.length > 50 ? 50 : aiResponseText.length)}...',
+        );
       }
       return;
     }
-    
+
     // Immediately add AI message to UI for instant feedback
     // Firestore stream will update later and replace temp messages with real ones
     final aiMessageTimestamp = DateTime.now();
-    final tempAiMessageId = aiMessageId ?? 'temp_ai_${DateTime.now().millisecondsSinceEpoch}';
-    
+    final tempAiMessageId =
+        aiMessageId ?? 'temp_ai_${DateTime.now().millisecondsSinceEpoch}';
+
     final aiMessage = ChatMessageModel(
       id: tempAiMessageId,
       userId: userId!,
@@ -846,34 +905,40 @@ class ChatController extends BaseController {
       type: 'ai',
       timestamp: aiMessageTimestamp,
     );
-    
+
     // Add AI message immediately to the list
     final updatedMessages = List<ChatMessageModel>.from(messages);
-    
+
     // Replace temp user message with real one if we have user_message_id
     if (userMessageId != null) {
       final tempUserIndex = updatedMessages.indexWhere(
-        (msg) => msg.id.startsWith('temp_') && msg.type == 'user' && msg.message == originalMessageText,
+        (msg) =>
+            msg.id.startsWith('temp_') &&
+            msg.type == 'user' &&
+            msg.message == originalMessageText,
       );
       if (tempUserIndex != -1) {
         // Replace temp user message with real ID
-        updatedMessages[tempUserIndex] = updatedMessages[tempUserIndex].copyWith(id: userMessageId);
+        updatedMessages[tempUserIndex] = updatedMessages[tempUserIndex]
+            .copyWith(id: userMessageId);
         // Track this ID as processed to prevent duplicates
         _processedMessageIds.add(userMessageId);
         // Remove from temp tracking
         _tempMessageContent.remove(userMessageId);
       }
     }
-    
+
     // Add AI message
     updatedMessages.add(aiMessage);
     messages.value = updatedMessages;
-    
+
     if (kDebugMode) {
       print('✅ Added AI message immediately from API response');
       print('  - User Message ID: $userMessageId');
       print('  - AI Message ID: $aiMessageId');
-      print('  - Firestore stream will sync and replace temp messages with real ones');
+      print(
+        '  - Firestore stream will sync and replace temp messages with real ones',
+      );
     }
   }
 
@@ -888,7 +953,7 @@ class ChatController extends BaseController {
     // Check free trial status
     final isInTrial = user != null && FreeTrialUtils.isWithinFreeTrial(user);
     final hasUnlimited = isSubscribed || isInTrial;
-    
+
     // If user has unlimited (trial or subscribed), don't check limit
     if (hasUnlimited) {
       remainingMessages.value = 999; // Unlimited indicator
@@ -901,7 +966,7 @@ class ChatController extends BaseController {
       // For now, use mock data or existing Firestore data
       final limit = await _chatApiService.checkDailyLimit(userId!);
       remainingMessages.value = limit;
-      
+
       // Also sync with SubscriptionController to keep ProfileScreen in sync
       try {
         if (Get.isRegistered<SubscriptionController>()) {
@@ -919,12 +984,13 @@ class ChatController extends BaseController {
       }
       // Default to free tier limit if check fails
       remainingMessages.value = AppConfig.freeMessageLimit;
-      
+
       // Also sync with SubscriptionController
       try {
         if (Get.isRegistered<SubscriptionController>()) {
           final subscriptionController = Get.find<SubscriptionController>();
-          subscriptionController.remainingFreeMessages.value = AppConfig.freeMessageLimit;
+          subscriptionController.remainingFreeMessages.value =
+              AppConfig.freeMessageLimit;
         }
       } catch (e) {
         if (kDebugMode) {
@@ -949,12 +1015,12 @@ class ChatController extends BaseController {
 
       final maxScroll = scrollController.position.maxScrollExtent;
       final currentScroll = scrollController.offset;
-      
+
       if (maxScroll > 0 && (maxScroll - currentScroll).abs() > 10) {
         // Not at bottom yet, scroll there
         scrollController.jumpTo(maxScroll);
         _updateVisibleDate();
-        
+
         // Try again after a delay if we're still not at bottom (content might still be measuring)
         if (attempt < 3) {
           Future.delayed(const Duration(milliseconds: 200), () {
@@ -989,27 +1055,31 @@ class ChatController extends BaseController {
 
         // Get keyboard height from MediaQuery
         final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-        
+
         if (keyboardHeight > 0) {
           final maxScroll = scrollController.position.maxScrollExtent;
           final currentScroll = scrollController.offset;
-          
+
           // If we're at or near the bottom, scroll up to show last message above keyboard
           final isNearBottom = (maxScroll - currentScroll) < 150;
-          
+
           if (isNearBottom && maxScroll > 0) {
             // Calculate scroll amount: keyboard height + input field height + padding
             // This ensures the last message is clearly visible above the keyboard
-            final scrollUpAmount = keyboardHeight + 120; // Extra padding for visibility
-            final targetScroll = (currentScroll + scrollUpAmount).clamp(0.0, maxScroll);
-            
+            final scrollUpAmount =
+                keyboardHeight + 120; // Extra padding for visibility
+            final targetScroll = (currentScroll + scrollUpAmount).clamp(
+              0.0,
+              maxScroll,
+            );
+
             if (targetScroll > currentScroll) {
               scrollController.animateTo(
                 targetScroll,
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOut,
               );
-              
+
               // Update visible date after scroll
               Future.delayed(const Duration(milliseconds: 350), () {
                 _updateVisibleDate();
@@ -1029,17 +1099,17 @@ class ChatController extends BaseController {
 
     // Get the scroll position
     final scrollOffset = scrollController.offset;
-    
+
     // Estimate which message is at the top of the viewport
     // This is approximate - we calculate based on average message height
     // Note: We need context for screen height, so we'll use a default estimate
     // In a real implementation, you might want to track actual message heights
     final averageMessageHeight = 100.0; // Approximate height
     final estimatedIndex = (scrollOffset / averageMessageHeight).floor();
-    
+
     // Clamp to valid range
     final validIndex = estimatedIndex.clamp(0, messages.length - 1);
-    
+
     if (validIndex >= 0 && validIndex < messages.length) {
       final visibleMessage = messages[validIndex];
       final visibleDate = DateTime(
@@ -1047,14 +1117,14 @@ class ChatController extends BaseController {
         visibleMessage.timestamp.month,
         visibleMessage.timestamp.day,
       );
-      
+
       // Only update if different to avoid unnecessary rebuilds
       final currentDate = DateTime(
         this.visibleDate.value.year,
         this.visibleDate.value.month,
         this.visibleDate.value.day,
       );
-      
+
       if (!_isSameDay(currentDate, visibleDate)) {
         this.visibleDate.value = visibleDate;
       }
@@ -1075,10 +1145,11 @@ class ChatController extends BaseController {
     }
 
     final scrollOffset = scrollController.offset;
-    final averageMessageHeight = AppResponsive.screenHeight(context) * 0.1; // Approximate
+    final averageMessageHeight =
+        AppResponsive.screenHeight(context) * 0.1; // Approximate
     final estimatedIndex = (scrollOffset / averageMessageHeight).floor();
     final validIndex = estimatedIndex.clamp(0, messages.length - 1);
-    
+
     if (validIndex >= 0 && validIndex < messages.length) {
       final visibleMessage = messages[validIndex];
       final visibleDate = DateTime(
@@ -1086,13 +1157,13 @@ class ChatController extends BaseController {
         visibleMessage.timestamp.month,
         visibleMessage.timestamp.day,
       );
-      
+
       final currentDate = DateTime(
         this.visibleDate.value.year,
         this.visibleDate.value.month,
         this.visibleDate.value.day,
       );
-      
+
       if (!_isSameDay(currentDate, visibleDate)) {
         this.visibleDate.value = visibleDate;
       }
@@ -1144,5 +1215,3 @@ class ChatController extends BaseController {
     }
   }
 }
-
-

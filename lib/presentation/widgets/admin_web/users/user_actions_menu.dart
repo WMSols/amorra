@@ -30,6 +30,7 @@ class UserActionsMenu extends StatelessWidget {
       ),
       itemBuilder: (context) => [
         PopupMenuItem(
+          onTap: onViewDetails,
           child: Row(
             children: [
               Icon(
@@ -41,9 +42,9 @@ class UserActionsMenu extends StatelessWidget {
               Text(WebTexts.usersViewDetails),
             ],
           ),
-          onTap: onViewDetails,
         ),
         PopupMenuItem(
+          onTap: onBlockUnblock,
           child: Row(
             children: [
               Icon(
@@ -52,15 +53,13 @@ class UserActionsMenu extends StatelessWidget {
                 color: AppColors.grey,
               ),
               WebSpacing.horizontalSpacing(context, 0.5),
-              Text(user.isBlocked
-                  ? WebTexts.usersUnblock
-                  : WebTexts.usersBlock),
+              Text(
+                user.isBlocked ? WebTexts.usersUnblock : WebTexts.usersBlock,
+              ),
             ],
           ),
-          onTap: onBlockUnblock,
         ),
       ],
     );
   }
 }
-

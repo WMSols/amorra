@@ -38,25 +38,24 @@ class ProfileSetupPillButtonGroup extends StatelessWidget {
           ),
         ),
         child: Wrap(
-        spacing: AppResponsive.screenWidth(context) * 0.01,
-        runSpacing: AppResponsive.screenHeight(context) * 0.005,
-        children: options.map((option) {
-          final isSelected = selectedOptions.contains(option);
-          return ProfileSetupPillButton(
-            label: option,
-            isSelected: isSelected,
-            onTap: () {
-              // Always pass the option - controller will handle toggle logic
-              if (onSelect != null) {
-                onSelect!(option);
-              }
-            },
-            errorText: hasError ? errorText : null,
-          );
-        }).toList(),
+          spacing: AppResponsive.screenWidth(context) * 0.01,
+          runSpacing: AppResponsive.screenHeight(context) * 0.005,
+          children: options.map((option) {
+            final isSelected = selectedOptions.contains(option);
+            return ProfileSetupPillButton(
+              label: option,
+              isSelected: isSelected,
+              onTap: () {
+                // Always pass the option - controller will handle toggle logic
+                if (onSelect != null) {
+                  onSelect!(option);
+                }
+              },
+              errorText: hasError ? errorText : null,
+            );
+          }).toList(),
         ),
       ),
     );
   }
 }
-

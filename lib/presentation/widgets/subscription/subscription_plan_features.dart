@@ -35,36 +35,35 @@ class SubscriptionPlanFeatures extends StatelessWidget {
           ),
           AppSpacing.vertical(context, 0.01),
           // Features List
-          ...features.map((feature) => Padding(
-                padding: EdgeInsets.only(
-                  bottom: AppResponsive.screenHeight(context) * 0.01,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Iconsax.tick_circle,
-                      size: AppResponsive.iconSize(context),
-                      color: isPremium
-                          ? AppColors.primary
-                          : AppColors.secondary,
-                    ),
-                    AppSpacing.horizontal(context, 0.02),
-                    Expanded(
-                      child: Text(
-                        feature,
-                        style: AppTextStyles.bodyText(context).copyWith(
-                          color: AppColors.black,
-                          fontSize: AppResponsive.scaleSize(context, 14),
-                        ),
+          ...features.map(
+            (feature) => Padding(
+              padding: EdgeInsets.only(
+                bottom: AppResponsive.screenHeight(context) * 0.01,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Iconsax.tick_circle,
+                    size: AppResponsive.iconSize(context),
+                    color: isPremium ? AppColors.primary : AppColors.secondary,
+                  ),
+                  AppSpacing.horizontal(context, 0.02),
+                  Expanded(
+                    child: Text(
+                      feature,
+                      style: AppTextStyles.bodyText(context).copyWith(
+                        color: AppColors.black,
+                        fontSize: AppResponsive.scaleSize(context, 14),
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
-

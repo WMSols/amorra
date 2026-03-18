@@ -26,7 +26,7 @@ class _ChatKeyboardHandlerState extends State<ChatKeyboardHandler>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
+
     // Listen to input field focus changes
     widget.inputFocusNode.addListener(() {
       if (widget.inputFocusNode.hasFocus) {
@@ -72,4 +72,3 @@ class _ChatKeyboardHandlerState extends State<ChatKeyboardHandler>
     return widget.child;
   }
 }
-

@@ -23,11 +23,11 @@ class UserActionDialogs {
       icon: user.isBlocked ? Iconsax.tick_circle : Iconsax.close_circle,
       iconColor: user.isBlocked ? AppColors.success : AppColors.error,
       secondaryButtonText: WebTexts.actionCancel,
-      primaryButtonText: user.isBlocked ? WebTexts.usersUnblock : WebTexts.usersBlock,
+      primaryButtonText: user.isBlocked
+          ? WebTexts.usersUnblock
+          : WebTexts.usersBlock,
       primaryButtonColor: user.isBlocked ? AppColors.success : AppColors.error,
       onPrimaryPressed: onConfirm,
     );
   }
-
 }
-

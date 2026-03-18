@@ -32,7 +32,7 @@ class ChatDailyLimitInfo extends StatelessWidget {
     if (isSubscribed) {
       return const SizedBox.shrink();
     }
-    
+
     if (isLimitReached) {
       return Container(
         padding: AppSpacing.symmetric(context, h: 0.04, v: 0.01),

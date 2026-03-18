@@ -41,7 +41,8 @@ class SubscriptionActionDialogs {
     WebAlertDialog.show(
       context: context,
       title: WebTexts.subscriptionsReactivate,
-      content: '${WebTexts.subscriptionsReactivateConfirm} ${subscription.userId}?',
+      content:
+          '${WebTexts.subscriptionsReactivateConfirm} ${subscription.userId}?',
       icon: Iconsax.tick_circle,
       iconColor: AppColors.success,
       secondaryButtonText: WebTexts.actionCancel,
@@ -51,4 +52,3 @@ class SubscriptionActionDialogs {
     );
   }
 }
-

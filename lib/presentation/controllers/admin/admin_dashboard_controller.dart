@@ -12,4 +12,3 @@ class AdminDashboardController extends AdminBaseController {
     selectedIndex.value = index;
   }
 }
-

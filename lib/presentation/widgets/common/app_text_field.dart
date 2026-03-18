@@ -36,7 +36,8 @@ class AppTextField extends StatefulWidget {
 }
 
 class _AppTextFieldState extends State<AppTextField> {
-  final GlobalKey<FormFieldState<String>> _fieldKey = GlobalKey<FormFieldState<String>>();
+  final GlobalKey<FormFieldState<String>> _fieldKey =
+      GlobalKey<FormFieldState<String>>();
   bool _hasInteracted = false;
 
   String? get _errorText {
@@ -52,10 +53,9 @@ class _AppTextFieldState extends State<AppTextField> {
       children: [
         Text(
           widget.label,
-          style: AppTextStyles.bodyText(context).copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-          ),
+          style: AppTextStyles.bodyText(
+            context,
+          ).copyWith(fontWeight: FontWeight.bold, color: AppColors.black),
         ),
         AppSpacing.vertical(context, 0.01),
         TextFormField(
@@ -88,14 +88,14 @@ class _AppTextFieldState extends State<AppTextField> {
             _hasInteracted = true;
           },
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          style: AppTextStyles.bodyText(context).copyWith(
-            color: AppColors.black,
-          ),
+          style: AppTextStyles.bodyText(
+            context,
+          ).copyWith(color: AppColors.black),
           decoration: InputDecoration(
             hintText: widget.hintText,
-            hintStyle: AppTextStyles.hintText(context).copyWith(
-              color: AppColors.grey,
-            ),
+            hintStyle: AppTextStyles.hintText(
+              context,
+            ).copyWith(color: AppColors.grey),
             suffixIcon: widget.showPasswordToggle
                 ? IconButton(
                     icon: Icon(
@@ -118,7 +118,9 @@ class _AppTextFieldState extends State<AppTextField> {
                 AppResponsive.radius(context, factor: 1.5),
               ),
               borderSide: BorderSide(
-                color: _errorText != null ? AppColors.error : AppColors.lightGrey,
+                color: _errorText != null
+                    ? AppColors.error
+                    : AppColors.lightGrey,
                 width: _errorText != null ? 1.5 : 1,
               ),
             ),
@@ -135,24 +137,15 @@ class _AppTextFieldState extends State<AppTextField> {
               borderRadius: BorderRadius.circular(
                 AppResponsive.radius(context, factor: 1.5),
               ),
-              borderSide: BorderSide(
-                color: AppColors.error,
-                width: 1.5,
-              ),
+              borderSide: BorderSide(color: AppColors.error, width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppResponsive.radius(context, factor: 1.5),
               ),
-              borderSide: BorderSide(
-                color: AppColors.error,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: AppColors.error, width: 2),
             ),
-            errorStyle: const TextStyle(
-              height: 0,
-              fontSize: 0,
-            ),
+            errorStyle: const TextStyle(height: 0, fontSize: 0),
             helperText: null,
           ),
         ),
@@ -163,4 +156,3 @@ class _AppTextFieldState extends State<AppTextField> {
     );
   }
 }
-

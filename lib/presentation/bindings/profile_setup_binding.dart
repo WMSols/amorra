@@ -9,4 +9,3 @@ class ProfileSetupBinding extends Bindings {
     Get.lazyPut(() => ProfileSetupController());
   }
 }
-

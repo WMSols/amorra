@@ -43,9 +43,7 @@ class SubscriptionPlanCard extends StatelessWidget {
           AppResponsive.radius(context, factor: 1.5),
         ),
         border: Border.all(
-          color: isPremium
-              ? AppColors.primary
-              : AppColors.grey,
+          color: isPremium ? AppColors.primary : AppColors.grey,
           width: isPremium ? 2 : 1,
         ),
         boxShadow: [
@@ -71,10 +69,7 @@ class SubscriptionPlanCard extends StatelessWidget {
           ),
 
           // Features
-          SubscriptionPlanFeatures(
-            features: features,
-            isPremium: isPremium,
-          ),
+          SubscriptionPlanFeatures(features: features, isPremium: isPremium),
 
           // Action
           SubscriptionPlanAction(
@@ -88,4 +83,3 @@ class SubscriptionPlanCard extends StatelessWidget {
     );
   }
 }
-

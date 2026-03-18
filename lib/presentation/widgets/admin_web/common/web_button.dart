@@ -30,7 +30,8 @@ class WebButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDisabled = onPressed == null || isLoading;
     final buttonColor = backgroundColor ?? AppColors.secondary;
-    final finalTextColor = textColor ?? (isOutlined ? buttonColor : AppColors.white);
+    final finalTextColor =
+        textColor ?? (isOutlined ? buttonColor : AppColors.white);
 
     return SizedBox(
       height: WebResponsive.isDesktop(context) ? 44 : 40,
@@ -53,10 +54,10 @@ class WebButton extends StatelessWidget {
               onPressed: isDisabled ? null : onPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDisabled
-                    ? AppColors.grey.withOpacity(0.3)
+                    ? AppColors.grey.withValues(alpha:0.3)
                     : buttonColor,
                 foregroundColor: finalTextColor,
-                disabledBackgroundColor: AppColors.grey.withOpacity(0.3),
+                disabledBackgroundColor: AppColors.grey.withValues(alpha:0.3),
                 padding: WebSpacing.button(context),
                 elevation: isDisabled ? 0 : 2,
                 shape: RoundedRectangleBorder(
@@ -94,9 +95,7 @@ class WebButton extends StatelessWidget {
           WebSpacing.horizontalSpacing(context, 0.5),
           Text(
             text,
-            style: WebTextStyles.buttonText(context).copyWith(
-              color: textColor,
-            ),
+            style: WebTextStyles.buttonText(context).copyWith(color: textColor),
           ),
         ],
       );
@@ -104,10 +103,7 @@ class WebButton extends StatelessWidget {
 
     return Text(
       text,
-      style: WebTextStyles.buttonText(context).copyWith(
-        color: textColor,
-      ),
+      style: WebTextStyles.buttonText(context).copyWith(color: textColor),
     );
   }
 }
-

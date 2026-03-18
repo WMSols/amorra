@@ -14,12 +14,12 @@ class ChatApiService {
   final FirebaseService _firebaseService = FirebaseService();
 
   /// Send message to AI via backend API
-  /// 
+  ///
   /// Request: POST /api/chat
   /// Body: { "user_id": string, "message": string, "chat_session_id"?: string (optional) }
   /// Headers: X-API-Key: <API_KEY>
   /// Response: { "message": string, "thread_id": string }
-  /// 
+  ///
   /// The API automatically manages conversation history and memory.
   /// Includes retry logic with exponential backoff
   Future<Map<String, dynamic>> sendMessageToAI({
@@ -30,15 +30,17 @@ class ChatApiService {
     // Backend base URL is configured via .env (API_BASE_URL)
     final baseUrl = ApiConstants.baseUrl;
     if (baseUrl.isEmpty) {
-      throw Exception('API_BASE_URL is not configured. Please set API_BASE_URL in your .env file.');
+      throw Exception(
+        'API_BASE_URL is not configured. Please set API_BASE_URL in your .env file.',
+      );
     }
     final url = Uri.parse('$baseUrl${ApiConstants.endpointChat}');
-    
+
     final requestBody = <String, dynamic>{
       'user_id': userId,
       'message': message,
     };
-    
+
     // Add chat_session_id only if provided (optional)
     if (chatSessionId != null && chatSessionId.isNotEmpty) {
       requestBody['chat_session_id'] = chatSessionId;
@@ -47,7 +49,7 @@ class ChatApiService {
     // Get API key from environment or use default test key
     // Backend expects X-API-Key header with value "321" for testing
     final apiKey = dotenv.env['BACKEND_API_KEY'] ?? '321';
-    
+
     // Prepare headers
     final headers = <String, String>{
       ApiConstants.headerContentType: ApiConstants.contentTypeJson,
@@ -60,31 +62,32 @@ class ChatApiService {
     while (attempt < AppConfig.maxRetryAttempts) {
       try {
         if (kDebugMode && attempt > 0) {
-          print('Retrying chat API call (attempt ${attempt + 1}/${AppConfig.maxRetryAttempts})');
+          print(
+            'Retrying chat API call (attempt ${attempt + 1}/${AppConfig.maxRetryAttempts})',
+          );
         }
 
         final response = await http
-            .post(
-              url,
-              headers: headers,
-              body: jsonEncode(requestBody),
-            )
-            .timeout(ApiConstants.chatApiTimeout); // Use longer timeout for AI responses
+            .post(url, headers: headers, body: jsonEncode(requestBody))
+            .timeout(
+              ApiConstants.chatApiTimeout,
+            ); // Use longer timeout for AI responses
 
         if (response.statusCode == 200) {
-          final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-          
+          final responseData =
+              jsonDecode(response.body) as Map<String, dynamic>;
+
           // API response format: { "data": { "message": string, "thread_id": string, ... }, "success": bool }
           // Extract the actual data object
           Map<String, dynamic>? messageData;
-          
+
           if (responseData['data'] != null) {
             messageData = responseData['data'] as Map<String, dynamic>?;
           } else if (responseData['message'] != null) {
             // Fallback: direct message format (for backward compatibility)
             messageData = responseData;
           }
-          
+
           // Validate response has required fields
           if (messageData == null || messageData['message'] == null) {
             if (kDebugMode) {
@@ -94,17 +97,19 @@ class ChatApiService {
             }
             throw Exception('Invalid API response: missing message field');
           }
-          
+
           // Extract message and thread_id from the data object
           final message = messageData['message'].toString();
           final threadId = messageData['thread_id']?.toString();
-          
+
           if (kDebugMode) {
             print('✅ Chat API response received');
-            print('  - Message: ${message.substring(0, message.length > 50 ? 50 : message.length)}...');
+            print(
+              '  - Message: ${message.substring(0, message.length > 50 ? 50 : message.length)}...',
+            );
             print('  - Thread ID: ${threadId ?? 'not provided'}');
           }
-          
+
           // Return normalized response format: { "message": string, "thread_id": string }
           return {
             'message': message,
@@ -117,31 +122,33 @@ class ChatApiService {
             print('Response body: ${response.body}');
             print('Request headers sent: $headers');
           }
-          
+
           // Non-200 status code - retry if it's a server error (5xx)
-          if (response.statusCode >= 500 && attempt < AppConfig.maxRetryAttempts - 1) {
+          if (response.statusCode >= 500 &&
+              attempt < AppConfig.maxRetryAttempts - 1) {
             lastException = Exception('Server error: ${response.statusCode}');
             await Future.delayed(AppConfig.retryDelay * (attempt + 1));
             attempt++;
             continue;
           }
-          
+
           // Client error (4xx) or final retry attempt - don't retry
-          final errorBody = response.body.isNotEmpty 
-              ? jsonDecode(response.body) 
+          final errorBody = response.body.isNotEmpty
+              ? jsonDecode(response.body)
               : {'error': 'HTTP ${response.statusCode}'};
           throw Exception(errorBody['error'] ?? 'HTTP ${response.statusCode}');
         }
       } catch (e) {
         lastException = e is Exception ? e : Exception(e.toString());
-        
+
         // Don't retry on timeout - AI responses legitimately take time
         // Only retry on actual network/server errors
         final isTimeout = e.toString().toLowerCase().contains('timeout');
-        final isNetworkError = e.toString().toLowerCase().contains('socket') ||
-                               e.toString().toLowerCase().contains('connection') ||
-                               e.toString().toLowerCase().contains('network');
-        
+        final isNetworkError =
+            e.toString().toLowerCase().contains('socket') ||
+            e.toString().toLowerCase().contains('connection') ||
+            e.toString().toLowerCase().contains('network');
+
         if (isTimeout) {
           // Timeout is expected for AI responses - don't retry, just throw
           if (kDebugMode) {
@@ -149,18 +156,21 @@ class ChatApiService {
           }
           rethrow;
         }
-        
+
         // Don't retry if it's the last attempt
         if (attempt >= AppConfig.maxRetryAttempts - 1) {
           rethrow;
         }
-        
+
         // Only retry on network/server errors (not timeouts)
-        if (isNetworkError || (lastException.toString().contains('500') || 
-                               lastException.toString().contains('502') ||
-                               lastException.toString().contains('503'))) {
+        if (isNetworkError ||
+            (lastException.toString().contains('500') ||
+                lastException.toString().contains('502') ||
+                lastException.toString().contains('503'))) {
           if (kDebugMode) {
-            print('🔄 Retrying chat API call due to network/server error (attempt ${attempt + 1}/${AppConfig.maxRetryAttempts})');
+            print(
+              '🔄 Retrying chat API call due to network/server error (attempt ${attempt + 1}/${AppConfig.maxRetryAttempts})',
+            );
           }
           // Wait before retrying with exponential backoff
           await Future.delayed(AppConfig.retryDelay * (attempt + 1));
@@ -173,7 +183,10 @@ class ChatApiService {
     }
 
     // Should never reach here, but just in case
-    throw lastException ?? Exception('Failed to send message after ${AppConfig.maxRetryAttempts} attempts');
+    throw lastException ??
+        Exception(
+          'Failed to send message after ${AppConfig.maxRetryAttempts} attempts',
+        );
   }
 
   /// Get AI response for a message
@@ -235,16 +248,14 @@ class ChatApiService {
       // Query for user messages sent today
       // Note: Firestore queries with multiple where clauses need composite index
       // For now, we'll query all user messages and filter in memory
-      final snapshot = await messagesRef
-          .where('type', isEqualTo: 'user')
-          .get();
+      final snapshot = await messagesRef.where('type', isEqualTo: 'user').get();
 
       // Filter messages sent today
       final messagesSentToday = snapshot.docs.where((doc) {
         final data = doc.data();
         final timestamp = data['timestamp'];
         if (timestamp == null) return false;
-        
+
         DateTime messageDate;
         if (timestamp is Timestamp) {
           messageDate = timestamp.toDate();
@@ -253,8 +264,9 @@ class ChatApiService {
         } else {
           return false;
         }
-        
-        return messageDate.isAfter(todayStart) && messageDate.isBefore(todayEnd);
+
+        return messageDate.isAfter(todayStart) &&
+            messageDate.isBefore(todayEnd);
       }).length;
 
       if (kDebugMode) {
@@ -264,7 +276,10 @@ class ChatApiService {
       }
 
       // Calculate remaining messages
-      final remaining = (AppConfig.freeMessageLimit - messagesSentToday).clamp(0, AppConfig.freeMessageLimit);
+      final remaining = (AppConfig.freeMessageLimit - messagesSentToday).clamp(
+        0,
+        AppConfig.freeMessageLimit,
+      );
 
       if (kDebugMode) {
         print('  - Remaining messages: $remaining');
@@ -281,67 +296,68 @@ class ChatApiService {
   }
 
   /// Update AI context when user preferences change
-  /// 
+  ///
   /// Request: POST /api/update-context
   /// Body: { "user_id": string }
   /// Headers: X-API-Key: <API_KEY>
   /// Response: { "success": bool, "message": string }
-  /// 
+  ///
   /// Call this immediately after a user saves new profile settings
   /// to notify the active AI conversation that preferences have changed.
-  Future<Map<String, dynamic>> updateContext({
-    required String userId,
-  }) async {
+  Future<Map<String, dynamic>> updateContext({required String userId}) async {
     try {
       final baseUrl = ApiConstants.baseUrl;
       final url = Uri.parse('$baseUrl${ApiConstants.endpointUpdateContext}');
-      
+
       // Get API key from environment or use default
       final apiKey = dotenv.env['BACKEND_API_KEY'] ?? '321';
-      
-      final requestBody = {
-        'user_id': userId,
-      };
-      
+
+      final requestBody = {'user_id': userId};
+
       if (kDebugMode) {
         print('🔄 Updating AI context for user: $userId');
         print('  - URL: $url');
       }
-      
-      final response = await http.post(
-        url,
-        headers: {
-          ApiConstants.headerContentType: ApiConstants.contentTypeJson,
-          ApiConstants.headerApiKey: apiKey,
-        },
-        body: jsonEncode(requestBody),
-      ).timeout(ApiConstants.connectTimeout);
-      
+
+      final response = await http
+          .post(
+            url,
+            headers: {
+              ApiConstants.headerContentType: ApiConstants.contentTypeJson,
+              ApiConstants.headerApiKey: apiKey,
+            },
+            body: jsonEncode(requestBody),
+          )
+          .timeout(ApiConstants.connectTimeout);
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        
+
         if (kDebugMode) {
           print('✅ AI context updated successfully');
           print('  - Response: ${data['message'] ?? 'Success'}');
         }
-        
+
         return data;
       } else {
         // Try to parse error message from response
         String errorMessage = 'Failed to update AI context';
         try {
           final errorData = jsonDecode(response.body) as Map<String, dynamic>;
-          errorMessage = errorData['error']?.toString() ?? errorData['message']?.toString() ?? errorMessage;
+          errorMessage =
+              errorData['error']?.toString() ??
+              errorData['message']?.toString() ??
+              errorMessage;
         } catch (_) {
           errorMessage = 'Server error: ${response.statusCode}';
         }
-        
+
         if (kDebugMode) {
           print('❌ Failed to update AI context: $errorMessage');
           print('  - Status: ${response.statusCode}');
           print('  - Body: ${response.body}');
         }
-        
+
         throw Exception(errorMessage);
       }
     } on SocketException catch (e) {
@@ -349,7 +365,9 @@ class ChatApiService {
       if (kDebugMode) {
         print('❌ Network error updating context: $errorMessage');
       }
-      throw Exception('$errorMessage\n\nPlease check:\n1. Backend server is running\n2. API_BASE_URL in .env file is correct\n3. Internet connection is active');
+      throw Exception(
+        '$errorMessage\n\nPlease check:\n1. Backend server is running\n2. API_BASE_URL in .env file is correct\n3. Internet connection is active',
+      );
     } catch (e) {
       if (kDebugMode) {
         print('❌ Update context error: $e');
@@ -358,4 +376,3 @@ class ChatApiService {
     }
   }
 }
-

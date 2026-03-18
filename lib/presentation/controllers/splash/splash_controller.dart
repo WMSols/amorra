@@ -32,7 +32,7 @@ class SplashController extends BaseController {
   void _startAnimation() {
     // Start with scale 0
     logoScale.value = 0.0;
-    
+
     // Animate to scale 1
     Future.delayed(const Duration(milliseconds: 100), () {
       logoScale.value = 1.0;
@@ -44,21 +44,21 @@ class SplashController extends BaseController {
     // Ensure minimum splash screen display time (2.5 seconds minimum)
     // This ensures splash is visible even in fast release builds
     await Future.delayed(const Duration(milliseconds: 2500));
-    
+
     Timer(const Duration(milliseconds: 500), () async {
       try {
         // Check if user is authenticated
         final currentUser = _firebaseService.currentUser;
-        
+
         if (currentUser != null) {
           // User is authenticated, first check if user is blocked
           if (kDebugMode) {
             print('✅ User authenticated, checking if user is blocked');
           }
-          
+
           // Get user data to check isBlocked status
           final userModel = await _authRepository.getCurrentUser();
-          
+
           if (userModel != null && userModel.isBlocked) {
             // User is blocked, navigate to blocked user screen
             if (kDebugMode) {
@@ -67,39 +67,52 @@ class SplashController extends BaseController {
             Get.offAllNamed(AppRoutes.blockedUser);
             return;
           }
-          
+
           // User is not blocked, check age verification
           if (kDebugMode) {
             print('✅ User not blocked, checking age verification');
           }
-          
-          final verificationStatus = await _authRepository.getAgeVerificationStatus(currentUser.uid);
-          
-          if (verificationStatus != null && verificationStatus['isAgeVerified'] == true) {
+
+          final verificationStatus = await _authRepository
+              .getAgeVerificationStatus(currentUser.uid);
+
+          if (verificationStatus != null &&
+              verificationStatus['isAgeVerified'] == true) {
             // User is verified, check profile setup status
-            final isProfileSetupCompleted = await _authRepository.getProfileSetupStatus(currentUser.uid);
-            
+            final isProfileSetupCompleted = await _authRepository
+                .getProfileSetupStatus(currentUser.uid);
+
             if (isProfileSetupCompleted) {
               // Profile setup completed, check onboarding status
-              final onboardingCompleted = _storage.read<bool>(AppConstants.storageKeyOnboardingCompleted) ?? false;
-              
+              final onboardingCompleted =
+                  _storage.read<bool>(
+                    AppConstants.storageKeyOnboardingCompleted,
+                  ) ??
+                  false;
+
               if (onboardingCompleted) {
                 // Onboarding completed, navigate to main
                 if (kDebugMode) {
-                  print('✅ User age verified, profile setup and onboarding completed, navigating to main');
+                  print(
+                    '✅ User age verified, profile setup and onboarding completed, navigating to main',
+                  );
                 }
                 Get.offAllNamed(AppRoutes.mainNavigation);
               } else {
                 // Onboarding not completed, navigate to onboarding
                 if (kDebugMode) {
-                  print('⚠️ User age verified and profile setup completed but onboarding not completed, navigating to onboarding');
+                  print(
+                    '⚠️ User age verified and profile setup completed but onboarding not completed, navigating to onboarding',
+                  );
                 }
                 Get.offAllNamed(AppRoutes.onboarding);
               }
             } else {
               // Profile setup not completed, navigate to profile setup
               if (kDebugMode) {
-                print('⚠️ User age verified but profile setup not completed, navigating to profile setup');
+                print(
+                  '⚠️ User age verified but profile setup not completed, navigating to profile setup',
+                );
               }
               Get.offAllNamed(AppRoutes.profileSetup);
             }
@@ -128,4 +141,3 @@ class SplashController extends BaseController {
     });
   }
 }
-

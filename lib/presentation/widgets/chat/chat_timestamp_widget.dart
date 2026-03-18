@@ -9,10 +9,7 @@ import 'package:intl/intl.dart';
 class ChatTimestampWidget extends StatelessWidget {
   final DateTime timestamp;
 
-  const ChatTimestampWidget({
-    super.key,
-    required this.timestamp,
-  });
+  const ChatTimestampWidget({super.key, required this.timestamp});
 
   String get _formattedTime {
     return DateFormat('h:mm a').format(timestamp);
@@ -29,4 +26,3 @@ class ChatTimestampWidget extends StatelessWidget {
     );
   }
 }
-
