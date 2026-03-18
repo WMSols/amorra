@@ -3,10 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// API Constants
 /// Contains API endpoints and configuration
 class ApiConstants {
-  // Base URLs - Load from environment variables with fallback defaults
-  // Default backend URL: https://ammora.onrender.com
-  // Full payment intent URL: https://ammora.onrender.com/api/create-payment-intent
-  static String get baseUrl => dotenv.env['API_BASE_URL'] ?? 'https://ammora.onrender.com';
+  // Base URLs - Load from environment variables (no hardcoded URL fallback).
+  static String get baseUrl => (dotenv.env['API_BASE_URL'] ?? '').trim();
   static String get aiApiBaseUrl => dotenv.env['AI_API_BASE_URL'] ?? 'https://api.openai.com/v1';
 
   // API Endpoints
@@ -14,10 +12,8 @@ class ApiConstants {
   static const String endpointChatCompletions = '/chat/completions';
   static const String endpointModeration = '/moderations';
   // Payment Intent Endpoint: /api/create-payment-intent
-  // Full URL: https://ammora.onrender.com/api/create-payment-intent
   static const String endpointCreatePaymentIntent = '/api/create-payment-intent';
   // Update Context Endpoint: /api/update-context
-  // Full URL: https://ammora.onrender.com/api/update-context
   static const String endpointUpdateContext = '/api/update-context';
 
   // Headers

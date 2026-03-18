@@ -106,10 +106,11 @@ class StripeService {
     required String userId,
   }) async {
     try {
-      // Get backend URL from environment or use default
-      // Default: https://ammora.onrender.com
-      // Full URL: https://ammora.onrender.com/api/create-payment-intent
-      final baseUrl = dotenv.env['API_BASE_URL'] ?? ApiConstants.baseUrl;
+      // Backend base URL is configured via .env (API_BASE_URL)
+      final baseUrl = ApiConstants.baseUrl;
+      if (baseUrl.isEmpty) {
+        throw Exception('API_BASE_URL is not configured. Please set API_BASE_URL in your .env file.');
+      }
       final url = Uri.parse('$baseUrl${ApiConstants.endpointCreatePaymentIntent}');
       
       // Get API key from environment or use default

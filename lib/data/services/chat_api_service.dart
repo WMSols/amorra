@@ -27,8 +27,11 @@ class ChatApiService {
     required String message,
     String? chatSessionId,
   }) async {
-    // Use the correct backend URL (override .env if it has wrong value)
+    // Backend base URL is configured via .env (API_BASE_URL)
     final baseUrl = ApiConstants.baseUrl;
+    if (baseUrl.isEmpty) {
+      throw Exception('API_BASE_URL is not configured. Please set API_BASE_URL in your .env file.');
+    }
     final url = Uri.parse('$baseUrl${ApiConstants.endpointChat}');
     
     final requestBody = <String, dynamic>{
