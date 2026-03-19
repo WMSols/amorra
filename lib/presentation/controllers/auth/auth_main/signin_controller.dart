@@ -31,6 +31,7 @@ class SigninController extends BaseController {
   final RxBool rememberMe = false.obs;
   final RxBool isEmailPasswordSigninLoading = false.obs;
   final RxBool isGoogleSigninLoading = false.obs;
+  final RxBool isAppleSigninLoading = false.obs;
 
   // Track if disposed
   bool _isDisposed = false;
@@ -376,6 +377,82 @@ class SigninController extends BaseController {
     } finally {
       if (!_isDisposed) {
         isGoogleSigninLoading.value = false;
+      }
+    }
+  }
+
+  /// Sign in with Apple
+  Future<void> signInWithApple() async {
+    if (_isDisposed || _isNavigating) return;
+
+    try {
+      isAppleSigninLoading.value = true;
+
+      // Unfocus to dismiss keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
+
+      await _authRepository.signInWithApple();
+
+      if (_isDisposed || _isNavigating) return;
+
+      // Check if user is blocked first
+      final currentUser = _firebaseService.currentUser;
+      if (currentUser != null) {
+        final userModel = await _authRepository.getCurrentUser();
+
+        if (userModel != null && userModel.isBlocked) {
+          _isNavigating = true;
+          await Future.delayed(const Duration(milliseconds: 300));
+          if (!_isDisposed) {
+            Get.offAllNamed(routes.AppRoutes.blockedUser);
+          }
+          return;
+        }
+
+        // User is not blocked, check age verification and profile setup status
+        final verificationStatus = await _authRepository
+            .getAgeVerificationStatus(currentUser.uid);
+
+        if (verificationStatus == null ||
+            verificationStatus['isAgeVerified'] != true) {
+          _isNavigating = true;
+          await Future.delayed(const Duration(milliseconds: 300));
+          if (!_isDisposed) {
+            Get.offAllNamed(routes.AppRoutes.ageVerification);
+          }
+          return;
+        }
+
+        final isProfileSetupCompleted = await _authRepository
+            .getProfileSetupStatus(currentUser.uid);
+        if (!isProfileSetupCompleted) {
+          _isNavigating = true;
+          await Future.delayed(const Duration(milliseconds: 300));
+          if (!_isDisposed) {
+            Get.offAllNamed(routes.AppRoutes.profileSetup);
+          }
+          return;
+        }
+      }
+
+      showSuccess(
+        'Welcome!',
+        subtitle: 'You\'ve successfully signed in with Apple.',
+      );
+
+      _isNavigating = true;
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!_isDisposed) {
+        Get.offAllNamed(routes.AppRoutes.mainNavigation);
+      }
+    } catch (e) {
+      if (_isDisposed) return;
+      final errorInfo = FirebaseErrorHandler.parseError(e);
+      showError(errorInfo['title']!, subtitle: errorInfo['subtitle']!);
+      _isNavigating = false;
+    } finally {
+      if (!_isDisposed) {
+        isAppleSigninLoading.value = false;
       }
     }
   }

@@ -153,6 +153,17 @@ class SigninScreen extends GetView<SigninController> {
                             isLoading: controller.isGoogleSigninLoading.value,
                           ),
                         ),
+                        AppSpacing.vertical(context, 0.015),
+
+                        // Apple Sign In Button (required for App Store login guideline)
+                        Obx(
+                          () => AppSocialButton(
+                            text: AppTexts.continueWithApple,
+                            icon: Icons.apple,
+                            onPressed: controller.signInWithApple,
+                            isLoading: controller.isAppleSigninLoading.value,
+                          ),
+                        ),
                         AppSpacing.vertical(context, 0.04),
 
                         // Auth Footer

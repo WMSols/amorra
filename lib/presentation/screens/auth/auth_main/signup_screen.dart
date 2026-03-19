@@ -147,6 +147,14 @@ class SignupScreen extends GetView<SignupController> {
                           imagePath: AppImages.googleLogo,
                           onPressed: controller.signUpWithGoogle,
                         ),
+                        AppSpacing.vertical(context, 0.015),
+
+                        // Apple Sign Up Button (required for App Store login guideline)
+                        AppSocialButton(
+                          text: AppTexts.continueWithApple,
+                          icon: Icons.apple,
+                          onPressed: controller.signUpWithApple,
+                        ),
                         AppSpacing.vertical(context, 0.04),
 
                         // Auth Footer

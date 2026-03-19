@@ -248,6 +248,44 @@ class SignupController extends BaseController {
     }
   }
 
+  /// Sign up / sign in with Apple
+  Future<void> signUpWithApple() async {
+    if (_isDisposed || _isNavigating) return;
+
+    try {
+      setLoading(true);
+
+      // Unfocus to dismiss keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
+
+      await _authRepository.signInWithApple();
+
+      if (_isDisposed || _isNavigating) return;
+
+      showSuccess(
+        'Account Ready!',
+        subtitle:
+            'You\'re signed in with Apple. Please verify your age to continue.',
+      );
+
+      _isNavigating = true;
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      if (!_isDisposed) {
+        Get.offAllNamed(routes.AppRoutes.ageVerification);
+      }
+    } catch (e) {
+      if (_isDisposed) return;
+      final errorInfo = FirebaseErrorHandler.parseError(e);
+      showError(errorInfo['title']!, subtitle: errorInfo['subtitle']!);
+      _isNavigating = false;
+    } finally {
+      if (!_isDisposed) {
+        setLoading(false);
+      }
+    }
+  }
+
   @override
   void onClose() {
     _isDisposed = true;

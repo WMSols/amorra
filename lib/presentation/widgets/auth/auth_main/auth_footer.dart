@@ -6,6 +6,7 @@ import 'package:amorra/core/utils/app_spacing/app_spacing.dart';
 import 'package:amorra/core/utils/app_styles/app_text_styles.dart';
 import 'package:amorra/core/utils/app_texts/app_texts.dart';
 import 'package:amorra/core/config/routes.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Auth Footer Widget
 /// Reusable footer for auth screens
@@ -14,6 +15,8 @@ import 'package:amorra/core/config/routes.dart';
 /// - Terms & Privacy + Login Link (for signup screen)
 class AuthFooter extends StatelessWidget {
   final AuthFooterType type;
+  static final Uri _termsUrl = Uri.parse('https://amorraai.web.app/terms.html');
+  static final Uri _privacyUrl = Uri.parse('https://amorraai.web.app/privacy.html');
 
   const AuthFooter({super.key, required this.type});
 
@@ -76,9 +79,7 @@ class AuthFooter extends StatelessWidget {
                   alignment: PlaceholderAlignment.baseline,
                   baseline: TextBaseline.alphabetic,
                   child: GestureDetector(
-                    onTap: () {
-                      // TODO: Navigate to terms
-                    },
+                    onTap: () => _openExternalLink(_termsUrl),
                     child: Text(
                       AppTexts.termsLink,
                       style: AppTextStyles.bodyText(context).copyWith(
@@ -100,9 +101,7 @@ class AuthFooter extends StatelessWidget {
                   alignment: PlaceholderAlignment.baseline,
                   baseline: TextBaseline.alphabetic,
                   child: GestureDetector(
-                    onTap: () {
-                      // TODO: Navigate to privacy
-                    },
+                    onTap: () => _openExternalLink(_privacyUrl),
                     child: Text(
                       AppTexts.privacyLink,
                       style: AppTextStyles.bodyText(context).copyWith(
@@ -148,6 +147,19 @@ class AuthFooter extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _openExternalLink(Uri uri) async {
+    final canOpen = await canLaunchUrl(uri);
+    if (!canOpen) {
+      Get.snackbar(
+        'Link unavailable',
+        'Could not open ${uri.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
 

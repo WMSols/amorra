@@ -36,6 +36,7 @@ class AppTexts {
   static const String loginButton = "Login";
   static const String orContinueWith = "Or continue with";
   static const String continueWithGoogle = "Continue with Google";
+  static const String continueWithApple = "Continue with Apple";
   static const String dontHaveAccount = "Don't have an account? ";
   static const String registerLink = "Register";
 

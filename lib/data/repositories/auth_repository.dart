@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:amorra/core/constants/app_constants.dart';
 import 'package:amorra/data/models/user_model.dart';
 import 'package:amorra/data/services/firebase_service.dart';
@@ -7,6 +9,8 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:crypto/crypto.dart';
 
 /// Custom exception for when user needs to complete signup
 class SignupRequiredException implements Exception {
@@ -45,6 +49,24 @@ class AuthRepository {
 
   // Temporary storage for Google credential when signup is required
   AuthCredential? _pendingGoogleCredential;
+
+  /// Generates a cryptographically secure random nonce, to be included in
+  /// Apple sign in requests and validated by Firebase.
+  String _generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
 
   /// Get pending Google credential (for linking after signup)
   AuthCredential? get pendingGoogleCredential => _pendingGoogleCredential;
@@ -655,6 +677,79 @@ class AuthRepository {
       }
       if (kDebugMode) {
         print('❌ Re-authentication error: $e');
+      }
+      rethrow;
+    }
+  }
+
+  /// Sign in with Google
+  Future<UserModel> signInWithApple() async {
+    try {
+      if (kDebugMode) {
+        print('🚀 Starting Apple sign-in');
+      }
+
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      final userCredential = await _firebaseService.auth.signInWithCredential(
+        oauthCredential,
+      );
+
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) {
+        throw Exception('Apple sign-in failed: user is null');
+      }
+
+      // Build display name from Apple data when provided (usually first sign-in).
+      String displayName = firebaseUser.displayName ?? '';
+      if (displayName.isEmpty &&
+          (appleCredential.givenName != null ||
+              appleCredential.familyName != null)) {
+        displayName =
+            '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
+                .trim();
+      }
+
+      // Email may be hidden after first sign-in; use Firebase email when available.
+      final email =
+          _normalizeEmail(firebaseUser.email ?? appleCredential.email ?? '');
+
+      // Create user document if missing.
+      final userDoc = await _firebaseService
+          .collection(AppConstants.collectionUsers)
+          .doc(firebaseUser.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        final userModel = UserModel(
+          id: firebaseUser.uid,
+          email: email,
+          name: displayName,
+          createdAt: DateTime.now(),
+        );
+        await createUser(userModel);
+        return userModel;
+      }
+
+      final userData = userDoc.data() as Map<String, dynamic>?;
+      return UserModel.fromJson({'id': firebaseUser.uid, ...?userData});
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ Apple sign-in error: $e');
       }
       rethrow;
     }
