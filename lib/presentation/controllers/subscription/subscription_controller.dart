@@ -26,6 +26,7 @@ class SubscriptionController extends BaseController {
   final RxBool isSubscribed = false.obs;
   final RxInt remainingFreeMessages = AppConfig.freeMessageLimit.obs;
   final RxBool isWithinFreeTrial = false.obs;
+  bool get isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
   // Get current user
   UserModel? get currentUser {
@@ -250,6 +251,15 @@ class SubscriptionController extends BaseController {
   ///
   /// Returns true if payment was successful, false otherwise
   Future<bool> purchaseSubscription(String planId) async {
+    if (isIOS) {
+      showInfo(
+        'Subscriptions on iOS coming soon',
+        subtitle:
+            'In-app subscription purchases for iOS are currently under setup. Please check back soon.',
+      );
+      return false;
+    }
+
     try {
       setLoading(true);
 
@@ -452,6 +462,15 @@ class SubscriptionController extends BaseController {
     } finally {
       setLoading(false);
     }
+  }
+
+  /// Show iOS-specific coming soon message for subscription purchases.
+  void showIosSubscriptionComingSoon() {
+    showInfo(
+      'Subscriptions on iOS coming soon',
+      subtitle:
+          'In-app subscription purchases for iOS are currently under setup. Please check back soon.',
+    );
   }
 
   /// Create or update subscription document in Firebase

@@ -689,6 +689,11 @@ class AuthRepository {
         print('🚀 Starting Apple sign-in');
       }
 
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        throw Exception('Sign in with Apple is not available on this device.');
+      }
+
       final rawNonce = _generateNonce();
       final nonce = _sha256ofString(rawNonce);
 
@@ -747,6 +752,22 @@ class AuthRepository {
 
       final userData = userDoc.data() as Map<String, dynamic>?;
       return UserModel.fromJson({'id': firebaseUser.uid, ...?userData});
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (kDebugMode) {
+        print('❌ Apple sign-in authorization error: ${e.code} - ${e.message}');
+      }
+      switch (e.code) {
+        case AuthorizationErrorCode.canceled:
+          throw Exception('Apple sign-in was canceled.');
+        case AuthorizationErrorCode.failed:
+        case AuthorizationErrorCode.invalidResponse:
+        case AuthorizationErrorCode.notHandled:
+        case AuthorizationErrorCode.notInteractive:
+        case AuthorizationErrorCode.unknown:
+          throw Exception(
+            'Apple sign-in is temporarily unavailable. Please try again.',
+          );
+      }
     } catch (e) {
       if (kDebugMode) {
         print('❌ Apple sign-in error: $e');
