@@ -51,6 +51,9 @@ class AppConstants {
       'Subscription activated successfully';
   static const String successMessageSent = 'Message sent';
 
+  // iOS In-App Purchase
+  static const String iosPremiumMonthlyProductId = 'amorra.premium.monthly';
+
   // Age Verification
   static const int minimumAge = 40;
 

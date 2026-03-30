@@ -84,11 +84,9 @@ class SubscriptionScreen extends GetView<SubscriptionController> {
                       isCurrentPlan: controller.isSubscribed.value,
                       onSelect: controller.isSubscribed.value
                           ? null
-                          : () => controller.isIOS
-                                ? controller.showIosSubscriptionComingSoon()
-                                : controller.purchaseSubscription(
-                                    'premium_monthly',
-                                  ),
+                          : () => controller.purchaseSubscription(
+                              'premium_monthly',
+                            ),
                       onCancel: controller.isSubscribed.value
                           ? () => controller.cancelSubscription()
                           : null,

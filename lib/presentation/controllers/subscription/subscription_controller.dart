@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:amorra/data/models/subscription_model.dart';
 import 'package:amorra/data/models/user_model.dart';
 import 'package:amorra/core/config/app_config.dart';
@@ -20,6 +23,8 @@ class SubscriptionController extends BaseController {
   final StripeService _stripeService = StripeService();
   final AuthRepository _authRepository = AuthRepository();
   final ChatApiService _chatApiService = ChatApiService();
+  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
+  StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
 
   // State
   final Rx<SubscriptionModel?> subscription = Rx<SubscriptionModel?>(null);
@@ -27,6 +32,7 @@ class SubscriptionController extends BaseController {
   final RxInt remainingFreeMessages = AppConfig.freeMessageLimit.obs;
   final RxBool isWithinFreeTrial = false.obs;
   bool get isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+  final RxBool isIapAvailable = false.obs;
 
   // Get current user
   UserModel? get currentUser {
@@ -43,11 +49,35 @@ class SubscriptionController extends BaseController {
   @override
   void onInit() {
     super.onInit();
+    _initializeIap();
     _checkFreeTrialStatus();
     checkSubscriptionStatus();
     _setupSubscriptionListener();
     _setupUserListener();
     _checkDailyLimit();
+  }
+
+  Future<void> _initializeIap() async {
+    if (!isIOS) return;
+    isIapAvailable.value = await _inAppPurchase.isAvailable();
+    if (!isIapAvailable.value) {
+      if (kDebugMode) {
+        print('⚠️ iOS IAP is not available on this device');
+      }
+      return;
+    }
+    _purchaseSubscription ??= _inAppPurchase.purchaseStream.listen(
+      _listenToPurchaseUpdated,
+      onError: (error) {
+        if (kDebugMode) {
+          print('❌ IAP purchase stream error: $error');
+        }
+      },
+      onDone: () {
+        _purchaseSubscription?.cancel();
+        _purchaseSubscription = null;
+      },
+    );
   }
 
   /// Setup listener for user changes to update free trial status
@@ -252,12 +282,7 @@ class SubscriptionController extends BaseController {
   /// Returns true if payment was successful, false otherwise
   Future<bool> purchaseSubscription(String planId) async {
     if (isIOS) {
-      showInfo(
-        'Subscriptions on iOS coming soon',
-        subtitle:
-            'In-app subscription purchases for iOS are currently under setup. Please check back soon.',
-      );
-      return false;
+      return _purchaseSubscriptionIOS(planId);
     }
 
     try {
@@ -464,13 +489,119 @@ class SubscriptionController extends BaseController {
     }
   }
 
-  /// Show iOS-specific coming soon message for subscription purchases.
-  void showIosSubscriptionComingSoon() {
-    showInfo(
-      'Subscriptions on iOS coming soon',
-      subtitle:
-          'In-app subscription purchases for iOS are currently under setup. Please check back soon.',
-    );
+  Future<bool> _purchaseSubscriptionIOS(String planId) async {
+    try {
+      setLoading(true);
+      if (!isIapAvailable.value) {
+        showError(
+          'Purchase Unavailable',
+          subtitle: 'In-app purchases are not available right now. Please try again later.',
+        );
+        return false;
+      }
+
+      final userId = _firebaseService.currentUserId;
+      if (userId == null) {
+        showError(
+          'Authentication Required',
+          subtitle: 'Please sign in to purchase a subscription.',
+        );
+        return false;
+      }
+
+      final productId = AppConstants.iosPremiumMonthlyProductId;
+      final response = await _inAppPurchase.queryProductDetails({productId});
+      if (response.error != null) {
+        showError(
+          'Store Error',
+          subtitle: response.error!.message,
+        );
+        return false;
+      }
+
+      if (response.productDetails.isEmpty) {
+        showError(
+          'Product Not Available',
+          subtitle:
+              'Subscription product is not available in App Store Connect yet.',
+        );
+        return false;
+      }
+
+      final productDetails = response.productDetails.first;
+      final purchaseParam = PurchaseParam(productDetails: productDetails);
+      final started = await _inAppPurchase.buyNonConsumable(
+        purchaseParam: purchaseParam,
+      );
+
+      if (!started) {
+        showError(
+          'Purchase Not Started',
+          subtitle: 'Could not start purchase. Please try again.',
+        );
+      }
+      return started;
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ iOS IAP purchase error: $e');
+      }
+      showError(
+        'Purchase Failed',
+        subtitle: 'Unable to complete purchase. Please try again.',
+      );
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<void> _listenToPurchaseUpdated(
+    List<PurchaseDetails> purchaseDetailsList,
+  ) async {
+    for (final purchaseDetails in purchaseDetailsList) {
+      if (purchaseDetails.productID != AppConstants.iosPremiumMonthlyProductId) {
+        continue;
+      }
+
+      if (purchaseDetails.status == PurchaseStatus.pending) {
+        if (kDebugMode) {
+          print('⏳ iOS IAP purchase pending');
+        }
+      } else if (purchaseDetails.status == PurchaseStatus.error) {
+        showError(
+          'Purchase Failed',
+          subtitle: purchaseDetails.error?.message ?? 'Unknown purchase error.',
+        );
+      } else if (purchaseDetails.status == PurchaseStatus.purchased ||
+          purchaseDetails.status == PurchaseStatus.restored) {
+        final userId = _firebaseService.currentUserId;
+        if (userId != null) {
+          await _createOrUpdateSubscription(
+            userId: userId,
+            planId: 'premium_monthly',
+            amount: AppConfig.monthlySubscriptionPrice,
+            stripeSubscriptionId: null,
+          );
+          await _updateUserSubscriptionStatus(
+            userId: userId,
+            isSubscribed: true,
+            subscriptionStatus: AppConstants.subscriptionStatusActive,
+          );
+          await checkSubscriptionStatus();
+          await _refreshUserData();
+
+          showSuccess(
+            'Subscription Activated!',
+            subtitle:
+                'Your iOS subscription is now active. Enjoy premium access!',
+          );
+        }
+      }
+
+      if (purchaseDetails.pendingCompletePurchase) {
+        await _inAppPurchase.completePurchase(purchaseDetails);
+      }
+    }
   }
 
   /// Create or update subscription document in Firebase
@@ -698,5 +829,12 @@ class SubscriptionController extends BaseController {
         print('⚠️ Error syncing user subscription status: $e');
       }
     }
+  }
+
+  @override
+  void onClose() {
+    _purchaseSubscription?.cancel();
+    _purchaseSubscription = null;
+    super.onClose();
   }
 }
