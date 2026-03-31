@@ -68,6 +68,22 @@ class AuthRepository {
     return digest.toString();
   }
 
+  Map<String, dynamic>? _decodeJwtPayload(String jwt) {
+    try {
+      final parts = jwt.split('.');
+      if (parts.length < 2) return null;
+      final normalized = base64Url.normalize(parts[1]);
+      final payload = utf8.decode(base64Url.decode(normalized));
+      final decoded = jsonDecode(payload);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Get pending Google credential (for linking after signup)
   AuthCredential? get pendingGoogleCredential => _pendingGoogleCredential;
 
@@ -705,8 +721,24 @@ class AuthRepository {
         nonce: nonce,
       );
 
+      final identityToken = appleCredential.identityToken;
+      if (identityToken == null || identityToken.trim().isEmpty) {
+        throw Exception(
+          'Apple sign-in failed: Apple did not return an identity token.',
+        );
+      }
+
+      final tokenPayload = _decodeJwtPayload(identityToken);
+      if (kDebugMode && tokenPayload != null) {
+        print('🍎 Apple token diagnostics:');
+        print('   - aud: ${tokenPayload['aud']}');
+        print('   - iss: ${tokenPayload['iss']}');
+        print('   - nonce: ${tokenPayload['nonce']}');
+        print('   - nonce_supported: ${tokenPayload['nonce_supported']}');
+      }
+
       final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
+        idToken: identityToken,
         rawNonce: rawNonce,
       );
 
@@ -768,6 +800,18 @@ class AuthRepository {
             'Apple sign-in is temporarily unavailable. Please try again.',
           );
       }
+    } on FirebaseAuthException catch (e) {
+      if (kDebugMode) {
+        print('❌ Apple Firebase auth error: ${e.code} - ${e.message}');
+      }
+      if (e.code == 'invalid-credential') {
+        throw Exception(
+          'Apple credential validation failed in Firebase. '
+          'Please verify Firebase Apple provider settings (Team ID, Key ID, private key, Service ID) '
+          'and ensure the Apple key is configured for primary App ID com.example.amorra.',
+        );
+      }
+      rethrow;
     } catch (e) {
       if (kDebugMode) {
         print('❌ Apple sign-in error: $e');
