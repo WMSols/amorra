@@ -737,8 +737,16 @@ class AuthRepository {
         print('   - nonce_supported: ${tokenPayload['nonce_supported']}');
       }
 
+      final authorizationCode = appleCredential.authorizationCode;
+      if (authorizationCode == null || authorizationCode.trim().isEmpty) {
+        throw Exception(
+          'Apple sign-in failed: Apple did not return an authorization code.',
+        );
+      }
+
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: identityToken,
+        accessToken: authorizationCode,
         rawNonce: rawNonce,
       );
 
