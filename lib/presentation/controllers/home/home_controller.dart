@@ -188,14 +188,14 @@ class HomeController extends BaseController {
   /// Made public so MainNavigationController can call it
   void handleUserChange(UserModel? user) {
     try {
-      if (user != null && user.name.isNotEmpty) {
+      if (user != null) {
         if (kDebugMode) {
           print(
             '👤 User changed in HomeController: ${user.name} (ID: ${user.id})',
           );
         }
         // Set user name IMMEDIATELY (synchronously) - don't wait for async operations
-        userName.value = user.name;
+        userName.value = user.name.trim().isNotEmpty ? user.name : 'there';
         isUserNameLoading.value = false;
 
         // Cancel old suggestions stream first
@@ -210,9 +210,9 @@ class HomeController extends BaseController {
         // Then re-initialize all other data (async, but doesn't block UI)
         _initializeData();
       } else {
-        // User logged out or name is empty - cancel stream and reset state
+        // User logged out - cancel stream and reset state
         if (kDebugMode) {
-          print('👤 User logged out or name empty, resetting HomeController');
+          print('👤 User logged out, resetting HomeController');
         }
         _suggestionsSubscription?.cancel();
         _suggestionsSubscription = null;
