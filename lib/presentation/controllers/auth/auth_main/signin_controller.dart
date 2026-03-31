@@ -457,16 +457,6 @@ class SigninController extends BaseController {
     }
   }
 
-  /// Forgot password
-  void forgotPassword() {
-    if (_isDisposed) return;
-    showInfo(
-      'Coming Soon',
-      subtitle:
-          'Password recovery feature will be available shortly. Stay tuned!',
-    );
-  }
-
   @override
   void onClose() {
     _isDisposed = true;

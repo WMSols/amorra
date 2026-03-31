@@ -31,7 +31,6 @@ class AppTexts {
   static const String signinTitle = "Sign In";
   static const String signinWelcomeMessage =
       "Hi! Welcome back, you've been missed.";
-  static const String forgotPassword = "Forgot Password?";
   static const String rememberMe = "Remember Me";
   static const String loginButton = "Login";
   static const String orContinueWith = "Or continue with";

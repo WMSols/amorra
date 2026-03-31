@@ -60,6 +60,7 @@ class TextFormatter {
       if (boldAsteriskMatch != -1) {
         final endIndex = text.indexOf('**', boldAsteriskMatch + 2);
         if (endIndex != -1) {
+          // ignore: unnecessary_null_comparison
           if (nextMatch == null || boldAsteriskMatch < nextMatch) {
             nextMatch = boldAsteriskMatch;
             matchType = 'bold_asterisk';
