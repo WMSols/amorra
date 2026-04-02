@@ -495,7 +495,8 @@ class SubscriptionController extends BaseController {
       if (!isIapAvailable.value) {
         showError(
           'Purchase Unavailable',
-          subtitle: 'In-app purchases are not available right now. Please try again later.',
+          subtitle:
+              'In-app purchases are not available right now. Please try again later.',
         );
         return false;
       }
@@ -512,10 +513,7 @@ class SubscriptionController extends BaseController {
       final productId = AppConstants.iosPremiumMonthlyProductId;
       final response = await _inAppPurchase.queryProductDetails({productId});
       if (response.error != null) {
-        showError(
-          'Store Error',
-          subtitle: response.error!.message,
-        );
+        showError('Store Error', subtitle: response.error!.message);
         return false;
       }
 
@@ -559,7 +557,8 @@ class SubscriptionController extends BaseController {
     List<PurchaseDetails> purchaseDetailsList,
   ) async {
     for (final purchaseDetails in purchaseDetailsList) {
-      if (purchaseDetails.productID != AppConstants.iosPremiumMonthlyProductId) {
+      if (purchaseDetails.productID !=
+          AppConstants.iosPremiumMonthlyProductId) {
         continue;
       }
 

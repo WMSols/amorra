@@ -16,7 +16,9 @@ import 'package:url_launcher/url_launcher.dart';
 class AuthFooter extends StatelessWidget {
   final AuthFooterType type;
   static final Uri _termsUrl = Uri.parse('https://amorraai.web.app/terms.html');
-  static final Uri _privacyUrl = Uri.parse('https://amorraai.web.app/privacy.html');
+  static final Uri _privacyUrl = Uri.parse(
+    'https://amorraai.web.app/privacy.html',
+  );
 
   const AuthFooter({super.key, required this.type});
 

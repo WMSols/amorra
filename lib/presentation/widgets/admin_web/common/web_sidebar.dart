@@ -28,7 +28,7 @@ class WebSidebar extends StatelessWidget {
         color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(2, 0),
           ),
@@ -64,7 +64,7 @@ class WebSidebar extends StatelessWidget {
           Container(
             padding: WebSpacing.all(context, factor: 0.75),
             decoration: BoxDecoration(
-              color: AppColors.lightGrey.withValues(alpha:0.3),
+              color: AppColors.lightGrey.withValues(alpha: 0.3),
               border: Border(
                 top: BorderSide(color: AppColors.lightGrey, width: 1),
               ),
@@ -107,7 +107,7 @@ class WebSidebar extends StatelessWidget {
 
     return InkWell(
       onTap: () => onItemSelected(index),
-      hoverColor: AppColors.secondary.withValues(alpha:0.1),
+      hoverColor: AppColors.secondary.withValues(alpha: 0.1),
       child: Container(
         margin: WebSpacing.symmetric(context, h: 0.5, v: 0.25),
         padding: WebSpacing.symmetric(context, h: 0.75, v: 0.5),

@@ -54,10 +54,10 @@ class WebButton extends StatelessWidget {
               onPressed: isDisabled ? null : onPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDisabled
-                    ? AppColors.grey.withValues(alpha:0.3)
+                    ? AppColors.grey.withValues(alpha: 0.3)
                     : buttonColor,
                 foregroundColor: finalTextColor,
-                disabledBackgroundColor: AppColors.grey.withValues(alpha:0.3),
+                disabledBackgroundColor: AppColors.grey.withValues(alpha: 0.3),
                 padding: WebSpacing.button(context),
                 elevation: isDisabled ? 0 : 2,
                 shape: RoundedRectangleBorder(

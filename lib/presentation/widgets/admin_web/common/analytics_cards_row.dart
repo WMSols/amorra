@@ -28,7 +28,8 @@ class AnalyticsCardsRow extends StatelessWidget {
 
 /// Analytics Card Item Model
 class AnalyticsCardItem extends WebAnalyticsCard {
-  const AnalyticsCardItem({super.key, 
+  const AnalyticsCardItem({
+    super.key,
     required super.label,
     required super.value,
     required super.color,

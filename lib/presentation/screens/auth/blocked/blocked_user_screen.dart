@@ -51,7 +51,7 @@ class BlockedUserScreen extends GetView<BlockedUserController> {
                       Container(
                         padding: AppSpacing.all(context),
                         decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha:0.1),
+                          color: AppColors.error.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(

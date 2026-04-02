@@ -770,8 +770,9 @@ class AuthRepository {
       }
 
       // Email may be hidden after first sign-in; use Firebase email when available.
-      final email =
-          _normalizeEmail(firebaseUser.email ?? appleCredential.email ?? '');
+      final email = _normalizeEmail(
+        firebaseUser.email ?? appleCredential.email ?? '',
+      );
 
       // Create user document if missing.
       final userDoc = await _firebaseService

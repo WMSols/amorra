@@ -55,7 +55,7 @@ class WebTextField extends StatelessWidget {
             filled: true,
             fillColor: enabled
                 ? AppColors.white
-                : AppColors.lightGrey.withValues(alpha:0.3),
+                : AppColors.lightGrey.withValues(alpha: 0.3),
             contentPadding: WebSpacing.inputField(context),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
@@ -92,7 +92,7 @@ class WebTextField extends StatelessWidget {
                 WebResponsive.radius(context, factor: 1.0),
               ),
               borderSide: BorderSide(
-                color: AppColors.lightGrey.withValues(alpha:0.5),
+                color: AppColors.lightGrey.withValues(alpha: 0.5),
                 width: 1,
               ),
             ),

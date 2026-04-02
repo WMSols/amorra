@@ -27,7 +27,7 @@ class TextFormatter {
         codeStyle ??
         baseStyle.copyWith(
           fontFamily: 'monospace',
-          backgroundColor: baseStyle.color?.withValues(alpha:0.1),
+          backgroundColor: baseStyle.color?.withValues(alpha: 0.1),
         );
     final strikethrough =
         strikethroughStyle ??

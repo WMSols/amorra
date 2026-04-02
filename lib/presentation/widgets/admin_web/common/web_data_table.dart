@@ -41,7 +41,7 @@ class WebDataTable<T> extends StatelessWidget {
         border: Border.all(color: AppColors.lightGrey, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -62,14 +62,14 @@ class WebDataTable<T> extends StatelessWidget {
               dataRowHeight ?? (WebResponsive.isDesktop(context) ? 64 : 56),
           columnSpacing: WebResponsive.isDesktop(context) ? 56 : 24,
           headingRowColor: WidgetStateProperty.all(
-            AppColors.lightGrey.withValues(alpha:0.3),
+            AppColors.lightGrey.withValues(alpha: 0.3),
           ),
           dataRowColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return AppColors.primary.withValues(alpha:0.1);
+              return AppColors.primary.withValues(alpha: 0.1);
             }
             if (states.contains(WidgetState.hovered)) {
-              return AppColors.lightGrey.withValues(alpha:0.2);
+              return AppColors.lightGrey.withValues(alpha: 0.2);
             }
             return null;
           }),

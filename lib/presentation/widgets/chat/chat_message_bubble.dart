@@ -120,7 +120,9 @@ class ChatMessageBubble extends StatelessWidget {
                             fontSize: AppResponsive.scaleSize(context, 13),
                             height: 1.3,
                             fontFamily: 'monospace',
-                            backgroundColor: AppColors.white.withValues(alpha:0.2),
+                            backgroundColor: AppColors.white.withValues(
+                              alpha: 0.2,
+                            ),
                           ),
                           strikethroughStyle: AppTextStyles.bodyText(context)
                               .copyWith(
