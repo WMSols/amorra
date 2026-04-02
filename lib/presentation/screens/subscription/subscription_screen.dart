@@ -8,11 +8,20 @@ import 'package:amorra/presentation/widgets/subscription/subscription_plan_card.
 import 'package:amorra/presentation/widgets/subscription/subscription_header_section.dart';
 import 'package:amorra/presentation/controllers/subscription/subscription_controller.dart';
 import 'package:amorra/presentation/widgets/common/app_loading_indicator.dart';
+import 'package:amorra/core/utils/app_responsive/app_responsive.dart';
+import 'package:amorra/core/utils/app_styles/app_text_styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Subscription Screen
 /// Eye-catching subscription screen with plan selection
 class SubscriptionScreen extends GetView<SubscriptionController> {
   const SubscriptionScreen({super.key});
+  static final Uri _privacyUrl = Uri.parse(
+    'https://amorraai.web.app/privacy.html',
+  );
+  static final Uri _termsUrl = Uri.parse(
+    'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +100,8 @@ class SubscriptionScreen extends GetView<SubscriptionController> {
                           ? () => controller.cancelSubscription()
                           : null,
                     ),
+                    AppSpacing.vertical(context, 0.01),
+                    _buildLegalLinks(context),
                   ],
                 ),
               ),
@@ -99,5 +110,72 @@ class SubscriptionScreen extends GetView<SubscriptionController> {
         );
       }),
     );
+  }
+
+  Widget _buildLegalLinks(BuildContext context) {
+    return Center(
+      child: RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          style: AppTextStyles.bodyText(context).copyWith(
+            color: AppColors.grey,
+            fontSize: AppResponsive.scaleSize(context, 14),
+          ),
+          children: [
+            const TextSpan(text: AppTexts.subscriptionLegalPrefix),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.baseline,
+              baseline: TextBaseline.alphabetic,
+              child: GestureDetector(
+                onTap: () => _openExternalLink(_termsUrl),
+                child: Text(
+                  AppTexts.subscriptionTermsOfUseLink,
+                  style: AppTextStyles.bodyText(context).copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppResponsive.scaleSize(context, 14),
+                  ),
+                ),
+              ),
+            ),
+            TextSpan(
+              text: AppTexts.termsAnd,
+              style: AppTextStyles.bodyText(context).copyWith(
+                color: AppColors.grey,
+                fontSize: AppResponsive.scaleSize(context, 14),
+              ),
+            ),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.baseline,
+              baseline: TextBaseline.alphabetic,
+              child: GestureDetector(
+                onTap: () => _openExternalLink(_privacyUrl),
+                child: Text(
+                  AppTexts.privacyLink,
+                  style: AppTextStyles.bodyText(context).copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppResponsive.scaleSize(context, 14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openExternalLink(Uri uri) async {
+    final canOpen = await canLaunchUrl(uri);
+    if (!canOpen) {
+      Get.snackbar(
+        'Link unavailable',
+        'Could not open ${uri.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }

@@ -205,6 +205,8 @@ class AppTexts {
   static const String subscriptionManageCurrentPlan = "Manage Plan";
   static const String subscriptionCancelPlan = "Cancel Subscription";
   static const String subscriptionLoading = "Loading plans...";
+  static const String subscriptionLegalPrefix = "By subscribing, you agree to ";
+  static const String subscriptionTermsOfUseLink = "Terms of Use (EULA)";
 
   // Profile Setup Screen
   static const String profileSetupTitle = "Set Up Your Profile";
