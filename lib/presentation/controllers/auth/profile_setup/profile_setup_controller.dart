@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -154,6 +155,20 @@ class ProfileSetupController extends BaseController {
   void onInit() {
     super.onInit();
     loadExistingPreferences();
+  }
+
+  Future<T> _withTimeout<T>(
+    Future<T> future, {
+    Duration timeout = const Duration(seconds: 20),
+    String operation = 'operation',
+  }) async {
+    try {
+      return await future.timeout(timeout);
+    } on TimeoutException {
+      throw Exception(
+        '$operation is taking too long. Please check your connection and try again.',
+      );
+    }
   }
 
   /// Load existing preferences from Firestore (if any)
@@ -485,11 +500,18 @@ class ProfileSetupController extends BaseController {
       };
 
       // Save to Firestore
-      await _savePreferencesToFirestore(currentUser.uid, preferences);
+      await _withTimeout(
+        _savePreferencesToFirestore(currentUser.uid, preferences),
+        operation: 'Saving preferences',
+      );
 
       // Update AI context with new preferences
       try {
-        await _chatApiService.updateContext(userId: currentUser.uid);
+        await _withTimeout(
+          _chatApiService.updateContext(userId: currentUser.uid),
+          timeout: const Duration(seconds: 15),
+          operation: 'Updating AI context',
+        );
         if (kDebugMode) {
           print('✅ AI context updated with new preferences');
         }
@@ -579,11 +601,18 @@ class ProfileSetupController extends BaseController {
 
       // TODO: Replace with actual API call to save preferences
       // This will call ProfileApiService.savePreferences() when API is integrated
-      await _savePreferencesToFirestore(currentUser.uid, preferences);
+      await _withTimeout(
+        _savePreferencesToFirestore(currentUser.uid, preferences),
+        operation: 'Saving preferences',
+      );
 
       // Update AI context with new preferences
       try {
-        await _chatApiService.updateContext(userId: currentUser.uid);
+        await _withTimeout(
+          _chatApiService.updateContext(userId: currentUser.uid),
+          timeout: const Duration(seconds: 15),
+          operation: 'Updating AI context',
+        );
         if (kDebugMode) {
           print('✅ AI context updated with new preferences');
         }
@@ -617,10 +646,14 @@ class ProfileSetupController extends BaseController {
       if (firebaseUser != null) {
         try {
           // Check user document in Firestore for onboarding status
-          final userDoc = await _firebaseService
-              .collection(AppConstants.collectionUsers)
-              .doc(firebaseUser.uid)
-              .get();
+          final userDoc = await _withTimeout(
+            _firebaseService
+                .collection(AppConstants.collectionUsers)
+                .doc(firebaseUser.uid)
+                .get(),
+            timeout: const Duration(seconds: 15),
+            operation: 'Checking onboarding status',
+          );
 
           if (userDoc.exists && userDoc.data() != null) {
             final userData = userDoc.data() as Map<String, dynamic>?;
