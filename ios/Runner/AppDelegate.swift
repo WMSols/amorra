@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import FirebaseCore
+import FBSDKCoreKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -10,6 +11,11 @@ import FirebaseCore
   ) -> Bool {
     // Initialize Firebase
     FirebaseApp.configure()
+    // Initialize Meta/Facebook SDK
+    ApplicationDelegate.shared.application(
+      application,
+      didFinishLaunchingWithOptions: launchOptions
+    )
     
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -22,9 +28,13 @@ import FirebaseCore
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey : Any] = [:]
   ) -> Bool {
-    // Let Stripe handle its own URL callbacks
-    // The flutter_stripe plugin will handle Stripe-specific URLs
-    return super.application(app, open: url, options: options)
+    // Let Facebook SDK handle its callbacks first, then pass through to Flutter plugins (e.g., Stripe)
+    let handledByFacebook = ApplicationDelegate.shared.application(
+      app,
+      open: url,
+      options: options
+    )
+    return handledByFacebook || super.application(app, open: url, options: options)
   }
   
   // Handle universal links (if using Stripe with universal links)

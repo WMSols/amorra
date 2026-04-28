@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:facebook_app_events/facebook_app_events.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'firebase_config.dart';
 
 /// App Initializer
@@ -31,6 +33,9 @@ class AppInitializer {
 
     // Initialize Stripe (optional - can also be initialized on-demand)
     await _initializeStripe();
+
+    // Initialize Meta/Facebook App Events (optional)
+    await _initializeFacebookAppEvents();
 
     // Initialize GetX controllers
     _initializeControllers();
@@ -152,6 +157,47 @@ class AppInitializer {
         debugPrint('  Stripe will be initialized on-demand when needed');
       }
       // Continue app initialization - Stripe can be initialized later
+    }
+  }
+
+  /// Initialize Meta/Facebook App Events.
+  ///
+  /// This is optional and safe to skip if Meta SDK values are not configured.
+  static Future<void> _initializeFacebookAppEvents() async {
+    try {
+      final appId = dotenv.env['FACEBOOK_APP_ID'];
+      final clientToken = dotenv.env['FACEBOOK_CLIENT_TOKEN'];
+      if (appId == null ||
+          appId.isEmpty ||
+          clientToken == null ||
+          clientToken.isEmpty) {
+        if (kDebugMode) {
+          debugPrint(
+            'ℹ️ Facebook App Events not configured (FACEBOOK_APP_ID / FACEBOOK_CLIENT_TOKEN missing)',
+          );
+        }
+        return;
+      }
+
+      final facebookAppEvents = FacebookAppEvents();
+      await facebookAppEvents.setAutoLogAppEventsEnabled(true);
+
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final trackingStatus =
+            await AppTrackingTransparency.trackingAuthorizationStatus;
+        if (trackingStatus == TrackingStatus.notDetermined) {
+          await AppTrackingTransparency.requestTrackingAuthorization();
+        }
+      }
+
+      if (kDebugMode) {
+        debugPrint('✅ Facebook App Events initialized');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Facebook App Events initialization error: $e');
+      }
+      // Do not block app launch if Meta SDK init fails.
     }
   }
 

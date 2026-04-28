@@ -48,6 +48,20 @@
 	<!-- Export compliance: app uses only exempt (standard) encryption such as HTTPS/TLS -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Meta/Facebook SDK -->
+	<key>FacebookAppID</key>
+	<string>YOUR_FACEBOOK_APP_ID</string>
+	<key>FacebookClientToken</key>
+	<string>YOUR_FACEBOOK_CLIENT_TOKEN</string>
+	<key>FacebookDisplayName</key>
+	<string>Amorra AI</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier is used to measure app performance and improve ad relevance.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+	</array>
 	<!-- Stripe Configuration -->
 	<!-- Camera permission for card scanning feature -->
 	<key>NSCameraUsageDescription</key>
@@ -74,6 +88,15 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.example.amorra</string>
+			</array>
+		</dict>
+		<!-- Facebook URL Scheme -->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fbYOUR_FACEBOOK_APP_ID</string>
 			</array>
 		</dict>
 	</array>
